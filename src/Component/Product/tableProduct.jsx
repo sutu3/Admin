@@ -101,18 +101,18 @@ export default function App({products,number}) {
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 ">
+            <Tooltip content="Details" className="border-yellow-400 rounded-2xl border-2 text-yellow-500">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-yellow-500">
                 <EyeIcon />
               </span>
             </Tooltip>
-            <Tooltip content="Edit product">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+            <Tooltip content="Edit product"  className="border-blue-400 rounded-2xl border-2 text-blue-500">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-blue-500 ">
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete product" className=" ">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50 text-red-500">
+            <Tooltip color="danger" content="Delete product" className="border-red-400 rounded-2xl border-2 text-red-500">
+              <span className="text-lg text-danger cursor-pointer active:opacity-50 text-red-500 ">
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -122,7 +122,7 @@ export default function App({products,number}) {
         return cellValue;
     }
   }, []);
- const itemsPerPage = 10;
+ const itemsPerPage = 7;
   const startIndex = (number - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedProducts = products.slice(startIndex, endIndex);
