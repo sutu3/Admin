@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Autocomplete, AutocompleteSection, AutocompleteItem } from '@nextui-org/react';
-
 const Container = styled.div`
   position: relative;
   width: 250px;
@@ -21,19 +20,21 @@ const Label = styled.label`
 `;
 
 export default function App({ value, setValue, content, data }) {
+    console.log(value)
   const handleSelectionChange = (e) => {
-    setValue(e.target.value);
+    console.log(e)
+    setValue(e);
   };
 
   return (
-    <Container className="mb-20">
+    <Container className="mb-0">
       <Label id="autocomplete-label">{content}</Label>
       <Autocomplete
         aria-labelledby="autocomplete-label"
         value={value}
-        onChange={handleSelectionChange}
+        onInputChange={handleSelectionChange}
         placeholder={`Search a ${content}`}
-        className="w-[250px] h-fit backdrop-blur-lg rounded-2xl border-[2px] border-slate-400"
+        className="w-[200px] h-fit backdrop-blur-lg rounded-lg border-[2px] border-slate-400"
       >
         <AutocompleteSection showDivider title={content} className="pb-2 backdrop-blur-xl rounded-2xl">
           {data.map((el, index) => (
