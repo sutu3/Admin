@@ -13,6 +13,7 @@ import AddProduct from "./Component/Product/AddProduct";
 import { Provider } from "react-redux";
 import store from "./Component/Redux/store";
 import { ToastContainer } from "react-toastify";
+import Purchar from "./Component/Product/Purchar";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -27,7 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/Product" element={<Product />}>
               <Route path="" index element={<ListProduct />} />
               <Route path="Add" index element={<AddProduct />} />
-              <Route path="Import" index element={<AddProduct />} />
+              <Route path="Import" index element={<Purchar />} />
               <Route path="Update" index element={<AddProduct />} />
             </Route>
           </Route>

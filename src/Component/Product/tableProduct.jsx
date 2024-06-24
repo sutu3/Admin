@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Checkbox, Button, Pagination, Spinner } from "@nextui-org/react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Checkbox, Button, Pagination, Spinner, User, CircularProgress } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon.jsx";
 import { DeleteIcon } from "./DeleteIcon.jsx";
 import { EyeIcon } from "./EyeIcon.jsx";
+import { Plus } from "./plus.jsx";
 import Modal from "../Modal/index.jsx";
 
 const statusColorMap = {
@@ -38,19 +39,32 @@ export default function App({ setnumber, products, number, columns, setSelected,
     const cellValue = product[columnKey];
 
     switch (columnKey) {
-      case "role":
+      case "NameProduct":
         return (
-          <div className="flex flex-col">
-            <p className="text-bold text-sm capitalize">{cellValue}</p>
-            <p className="text-bold text-sm capitalize text-default-400">{product.team}</p>
-          </div>
+          <User
+            avatarProps={{radius: "lg", src: product.avatar}}
+            description={product.name}
+            name={product.id}
+          >
+            {product.name}
+          </User>
         );
-      case "status":
+      case "state":
         return (
           <Chip className="capitalize" color={statusColorMap[product.status]} size="sm" variant="flat">
             {cellValue}
           </Chip>
         );
+      case "quantity":
+        return (
+          <CircularProgress
+      size="lg"
+      value={(product.quantity/300)*100}
+      color="success"
+      className={`${(product.quantity/300)*100<25?"text-red-400":(product.quantity/300)*100>=25 &&(product.quantity/300)*100<75?"text-yellow-400":"text-green-400"}`}
+      showValueLabel={true}
+    />
+        );  
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
@@ -72,6 +86,16 @@ export default function App({ setnumber, products, number, columns, setSelected,
                   style={"bg-red-300 w-[10px] p-0 m-0"}
                   content={"Bạn Có Muốn Xác Nhận xóa Sản Phẩm Với Id:01 Tên:Product1 Không?"}
                 />
+              </span>
+            </Tooltip>
+          </div>
+        );
+        case "Plus":
+        return (
+          <div className="relative flex items-center gap-2">
+            <Tooltip content="Import" className="hover:bg-orange-300 hover:text-white border-orange-300 rounded-2xl border-2 text-orange-300">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-orange-300">
+                <Plus />
               </span>
             </Tooltip>
           </div>
