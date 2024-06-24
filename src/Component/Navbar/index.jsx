@@ -10,6 +10,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShirt, faCartFlatbed,faCubesStacked } from "@fortawesome/free-solid-svg-icons";
 import { Badge } from "@nextui-org/react";
+import { ToastContainer } from "react-toastify";
 
 const data = [
   {

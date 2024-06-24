@@ -3,6 +3,7 @@ import Tabs from './Tabs'
 import { faFileImport, faUpload } from '@fortawesome/free-solid-svg-icons';
 import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import MiniNav from '../MiniNav/index.jsx'
+import { ToastContainer } from 'react-toastify';
 const data = [
   {
     content: "List Product",

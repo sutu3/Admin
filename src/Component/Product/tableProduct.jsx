@@ -1,21 +1,9 @@
-import React, { useState } from "react";
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Checkbox, Button } from "@nextui-org/react";
+import React, { useState, useCallback } from "react";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Tooltip, Checkbox, Button, Pagination, Spinner } from "@nextui-org/react";
 import { EditIcon } from "./EditIcon.jsx";
 import { DeleteIcon } from "./DeleteIcon.jsx";
 import { EyeIcon } from "./EyeIcon.jsx";
-import Modal from "../Modal/index.jsx"
-const columns = [
-  { name: "", uid: "checkbox" },  // Thêm cột cho checkbox
-  { name: "ID", uid: "id" },
-  { name: "Type of Product", uid: "typeOfProduct" },
-  { name: "Name", uid: "name" },
-  { name: "State", uid: "state" },
-  { name: "Material", uid: "materialProduct" },
-  { name: "Created At", uid: "createdAt" },
-  { name: "Updated At", uid: "updatedAt" },
-  { name: "Updated By", uid: "userUpdate" },
-  { name: "ACTIONS", uid: "actions" }
-];
+import Modal from "../Modal/index.jsx";
 
 const statusColorMap = {
   active: "success",
@@ -23,16 +11,19 @@ const statusColorMap = {
   vacation: "warning",
 };
 
-export default function App({ products, number }) {
-  const [selected, setSelected] = useState([]);
+export default function App({ setnumber, products, number, columns, setSelected, selected }) {
+
+  
+  const loadingState = products.length === 0 ? "loading" : "idle";
 
   const handleSelectAll = () => {
     const allValues = products.map(product => product.id.toString());
-    console.log(allValues)
+    console.log(allValues);
     setSelected(allValues);
   };
 
   const handleCheckboxChange = (id) => {
+    console.log(id)
     setSelected(prevSelected => {
       if (prevSelected.includes(id)) {
         return prevSelected.filter(item => item !== id);
@@ -42,7 +33,8 @@ export default function App({ products, number }) {
     });
   };
 
-  const renderCell = React.useCallback((product, columnKey) => {
+
+  const renderCell = useCallback((product, columnKey) => {
     const cellValue = product[columnKey];
 
     switch (columnKey) {
@@ -68,28 +60,25 @@ export default function App({ products, number }) {
               </span>
             </Tooltip>
             <Tooltip content="Edit product" className="border-blue-400 rounded-2xl border-2 text-blue-500">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-blue-500 ">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-blue-500">
                 <EditIcon />
               </span>
             </Tooltip>
             <Tooltip color="danger" content="Delete product" className="border-red-400 rounded-2xl border-2 text-red-500">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50 text-red-500 ">
+              <span className="text-lg text-danger cursor-pointer active:opacity-50 text-red-500">
                 <Modal
-              contentButton={<DeleteIcon />}
-              title={"Delete Product"}
-               style={"bg-red-300 w-[10px] p-0 m-0"}
-              content={
-                "Bạn Có Muốn Xác Nhận xóa Sản Phẩm Với Id:01 Tên:Product1 Không?"
-              }
-            />
-                
+                  contentButton={<DeleteIcon />}
+                  title={"Delete Product"}
+                  style={"bg-red-300 w-[10px] p-0 m-0"}
+                  content={"Bạn Có Muốn Xác Nhận xóa Sản Phẩm Với Id:01 Tên:Product1 Không?"}
+                />
               </span>
             </Tooltip>
           </div>
         );
       case "checkbox":
         return (
-          <Checkbox 
+          <Checkbox
             isSelected={selected.includes(product.id.toString())}
             onChange={() => handleCheckboxChange(product.id.toString())}
           />
@@ -109,17 +98,33 @@ export default function App({ products, number }) {
       <Button onPress={handleSelectAll} className="mb-4 items-start flex">
         Select All
       </Button>
-      <Table aria-label="Example table with custom cells" className="border-2 border-slate-500 rounded-lg">
+      <Table bottomContent={
+        <div className="flex w-full justify-center">
+          <Pagination
+            isCompact
+            showControls
+            showShadow
+            color="secondary"
+            className="text-blue-500 border-slate-400 rounded-md"
+            page={number}
+            total={Math.ceil(products.length / 7)}
+            onChange={(page) => setnumber(page)}
+          />
+        </div>
+      } aria-label="Example table with custom cells" className="border-2 shadow-lg border-slate-500 rounded-lg">
         <TableHeader columns={columns}>
           {(column) => (
-            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} className="bg-slate-400 p-3">
+            <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"} className="text-[#71717a] bg-[#f4f4f5] p-3">
               {column.name}
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody>
+        <TableBody loadingContent={<Spinner />} loadingState={loadingState}>
           {paginatedProducts.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow
+              key={product.id}
+              className={`border-b-[3px] border-slate-300 cursor-pointer`}
+            >
               {columns.map((column) => (
                 <TableCell key={column.uid}>{renderCell(product, column.uid)}</TableCell>
               ))}

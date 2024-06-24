@@ -10,9 +10,13 @@ import Value from "./Component/Dashboard/value";
 import Chart from "./Component/Dashboard/chart";
 import Product from './Component/Product/index'
 import AddProduct from "./Component/Product/AddProduct";
+import { Provider } from "react-redux";
+import store from "./Component/Redux/store";
+import { ToastContainer } from "react-toastify";
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
     <NextUIProvider>
+  <Provider store={store}>
+  <React.StrictMode>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<App />}>
@@ -29,6 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           </Route>
         </Routes>
       </BrowserRouter>
-    </NextUIProvider>
   </React.StrictMode>
+  </Provider>
+    </NextUIProvider>
 );
