@@ -70,7 +70,7 @@ const value = () => {
           value={65}
           icon={faBarsStaggered}
           content={"Total Money"}
-          bg={"slate-800"}
+          bg={"slate-600"}
           color={"bg-slate-200"}
         />
         <Card
