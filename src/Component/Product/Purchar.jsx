@@ -2,7 +2,10 @@ import { faShop } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import Button from "../Button/index";
+import { useLocation } from "react-router-dom";
 import TableProduct from "./tableProduct.jsx";
+import { product } from "../Redux/selector.jsx";
+import { useSelector } from "react-redux";
 import { Card, CardBody, CardFooter, Checkbox, Input, Radio, RadioGroup, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from "@nextui-org/react";
 const columns = [
   { name: "", uid: "checkbox" },  // Thêm cột cho checkbox
@@ -20,6 +23,12 @@ const data=[{
 const size = ['M', 'S', 'L', 'XL'];
 const color=['red','green','blue']
 const Purchar = () => {
+    const id=useLocation().pathname.split('/')[useLocation().pathname.split('/').length-1];
+    const Product=useSelector(product)
+    console.log(Product)
+    console.log(id)
+    const dataProduct=Product.filter((el)=>el.product_id==id)
+    console.log(dataProduct[0].name)
     const [arr, setArr] = useState("");
     console.log(arr);
 
@@ -51,7 +60,8 @@ const Purchar = () => {
                             isDisabled
                             labelPlacement="outside"
                             placeholder="Enter your description"
-                            defaultValue="Product A"
+                            defaultValue={dataProduct[0].name}
+                            value={dataProduct[0].name}
                             className="w-full h-[40px] text-[#878889] shadow-inner bg-[#eeeeee] rounded-xl text-left"
                         />
                     </div>
@@ -61,7 +71,8 @@ const Purchar = () => {
                             isDisabled
                             labelPlacement="outside"
                             placeholder="Enter your description"
-                            defaultValue="NextUI is a React UI library that provides a set of accessible, reusable, and beautiful components."
+                            defaultValue={dataProduct[0].description}
+                            value={dataProduct[0].description}
                             className="w-full text-[#878889] shadow-inner bg-[#eeeeee] rounded-xl text-left"
                         />
                     </div>
@@ -70,15 +81,15 @@ const Purchar = () => {
                             <div className="font-semibold justify-start flex w-full">Size</div>
                             <div className="text-xs font-[400] text-[#8d8f92] justify-start flex w-full">Pink Available Size</div>
                         <div className="flex flex-row gap-3">
-                            {size.map((el, index) => (
+                            {dataProduct[0].sizes.map((el, index) => (
                                 <button
                                     key={index}
                                     onClick={() => {
-                                        setArr(el);
+                                        setArr(el.size);
                                     }}
-                                    className={`w-14 h-12 ${arr==el ? "border-0 bg-green-300 text-white" : "outline-none bg-[#ededed]"} active::outline-none rounded`}
+                                    className={`w-14 h-12 ${arr==el.size ? "border-0 bg-green-300 text-white" : "outline-none bg-[#ededed]"} active::outline-none rounded`}
                                 >
-                                    {el}
+                                    {el.size}
                                 </button>
                             ))}
                         </div>
@@ -88,13 +99,13 @@ const Purchar = () => {
                             <div className="text-xs font-[400] text-[#8d8f92] justify-start flex w-full">Available Gender</div>
                             <div className="flex flex-row gap-4">
                             <div>
-                                <button className={`bg-[#86efac] text-white w-14 h-12 flex justify-center`}>Nam</button>
+                                <button disabled className={` ${dataProduct[0].gender==='Nam'?'bg-[#86efac] text-white':' border-2 border-slate-300'}  w-14 h-12 flex justify-center`}>Nam</button>
                             </div>
                             <div>
-                                <button className={`bg-[#86efac] text-white w-14 h-12 flex justify-center`}>Nữ</button>
+                                <button disabled className={`${dataProduct[0].gender==='Nữ'?'bg-[#86efac] text-white':'border-2 border-slate-300'} w-14 h-12 flex justify-center`}>Nữ</button>
                             </div>
                             <div>
-                                <button className={`bg-[#86efac] text-white w-14 h-12 flex justify-center`}>Khác</button>
+                                <button disabled className={`${dataProduct[0].gender==='Unisex'?'bg-[#86efac] text-white':' border-2 border-slate-300'} w-14 h-12 flex justify-center`}>Khác</button>
                             </div>
                         </div>
                         </div>

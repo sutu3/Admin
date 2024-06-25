@@ -5,6 +5,7 @@ import { DeleteIcon } from "./DeleteIcon.jsx";
 import { EyeIcon } from "./EyeIcon.jsx";
 import { Plus } from "./plus.jsx";
 import Modal from "../Modal/index.jsx";
+import { Link } from "react-router-dom";
 
 const statusColorMap = {
   active: "success",
@@ -93,11 +94,13 @@ export default function App({ setnumber, products, number, columns, setSelected,
         case "Plus":
         return (
           <div className="relative flex items-center gap-2">
+          <Link to={`${product.id}`}>
             <Tooltip content="Import" className="hover:bg-orange-300 hover:text-white border-orange-300 rounded-2xl border-2 text-orange-300">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-orange-300">
                 <Plus />
               </span>
             </Tooltip>
+            </Link>
           </div>
         );
       case "checkbox":

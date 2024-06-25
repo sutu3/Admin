@@ -23,13 +23,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/" element={<App />}>
             <Route path="/Dashboard" element={<Value />}>
               <Route path="Value" index element={<Value />} />
-              <Route path="Chart" index element={<Chart />} />
+              <Route path="Chart"  element={<Chart />} />
             </Route>
             <Route path="/Product" element={<Product />}>
               <Route path="" index element={<ListProduct />} />
-              <Route path="Add" index element={<AddProduct />} />
-              <Route path="Import" index element={<Purchar />} />
-              <Route path="Update" index element={<AddProduct />} />
+              <Route path="Add"  element={<AddProduct />} >
+              </Route>
+              <Route path="Add/:id" element={<Purchar />} />
+              <Route path="Import"  element={<Purchar />} />
+              <Route path="Update" element={<AddProduct />} />
             </Route>
           </Route>
         </Routes>

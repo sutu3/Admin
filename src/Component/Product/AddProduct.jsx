@@ -10,6 +10,8 @@ const columns = [
   { name: "Product", uid: "NameProduct" },
   { name: "Gender", uid: "gender" },
   { name: "Type", uid: "typeOfProduct" },
+  {name:"Material", uid: "material" },
+  {name:"Price", uid: "price" },
   { name: "Quantity", uid: "quantity" },
   { name: "Plus", uid: "Plus" },
 ];
@@ -64,8 +66,9 @@ const AddProduct = () => {
         </div>
       </div>
       <div className=" w-full h-full gap-4 flex flex-row">
-        <div className="h-[450px] -translate-y-10 w-[60%]">
+        <div className="h-[450px] -translate-y-10 w-[70%]">
             <TableProduct
+            
             setnumber={setCurrentPage}
             selected={selected}
             setSelected={setSelected}
@@ -75,6 +78,8 @@ const AddProduct = () => {
                 typeOfProduct: el.type,
                 name: el.name,
                 gender:el.gender,
+                material:el.materialProduct,
+                price:el.productVersion[el.productVersion.length-1].price,
                 avatar: el.productVersion[0]
                   ? el.productVersion[0].variants[0].images[0].image_urlString
                   : "",
