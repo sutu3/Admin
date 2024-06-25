@@ -1,3 +1,4 @@
+import { Card, CardBody, CardFooter, Chip, CircularProgress } from '@nextui-org/react';
 import React, { PureComponent } from 'react';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
@@ -14,32 +15,33 @@ export default class Example extends PureComponent {
 
   render() {
     return (
-     <div className='w-full flex flex-col justify-center items-center'>
-        <div className='translate-y-3 font-bold'>Tỷ Lệ Giao Hàng </div>
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <PieChart width={400} height={400}>
-              <Pie
-                data={orderData} // Sử dụng dữ liệu đơn hàng
-                cx={200} // Trung tâm biểu đồ
-                cy={200}
-                innerRadius={60}
-                outerRadius={80}
-                paddingAngle={10}
-                dataKey="value"
-              >
-                {orderData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip /> {/* Thêm Tooltip */}
-            </PieChart>
-          </div>
-          
-          <div className='w-full flex flex-row justify-center gap-5'>
-            <div className='w-full flex flex-row gap-3'><div className='bg-[#0088FE] w-5 h-5'></div> <div>Thành Công</div></div>
-            <div className='w-full flex flex-row gap-3'><div className='bg-[#FF8042] w-5 h-5'></div> <div>Đã Hủy</div></div>
-          </div>
-     </div>
+     <Card className="w-[260px] h-[260px] rounded-2xl border-none bg-gradient-to-br  from-blue-500 to-fuchsia-500">
+      <CardBody className="justify-center items-center pb-0">
+      <CardFooter className="justify-center items-center pt-0">
+        <Chip
+          classNames={{
+            base: "border-1 border-white/30",
+            content: "text-white/90 text-small font-semibold",
+          }}
+          variant="bordered"
+        >
+          Tỷ Lệ Giao Hàng Thành Công
+        </Chip>
+      </CardFooter>
+        <CircularProgress
+          classNames={{
+            svg: "w-52 h-52 drop-shadow-md ",
+            indicator: "stroke-white ",
+            track: "stroke-white/10 ",
+            value: "text-3xl font-semibold text-black",
+          }}
+          value={70}
+          strokeWidth={4}
+          showValueLabel={true}
+        />
+      </CardBody>
+      
+    </Card>
     );
   }
 }

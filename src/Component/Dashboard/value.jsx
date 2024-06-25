@@ -115,7 +115,7 @@ const value = () => {
         <div className="w-[700px]">
           <Table rows={topSellingProducts} columns={columns1} />
         </div>
-        <div>
+        <div className="w-full m-auto  ml-20 justify-end items-center">
           <Pie />
         </div>
       </div>
