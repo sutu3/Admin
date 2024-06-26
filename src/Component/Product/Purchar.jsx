@@ -20,17 +20,13 @@ const data=[{
     quanlity: 10,
     price: 100000
 }]
-const size = ['M', 'S', 'L', 'XL'];
-const color=['red','green','blue']
 const Purchar = () => {
     const id=useLocation().pathname.split('/')[useLocation().pathname.split('/').length-1];
     const Product=useSelector(product)
-    console.log(Product)
-    console.log(id)
+    const [color,setcolor]=useState([])
+    console.log(color)
     const dataProduct=Product.filter((el)=>el.product_id==id)
-    console.log(dataProduct[0].name)
     const [arr, setArr] = useState("");
-    console.log(arr);
 
     return (
         <div className="w-full h-full flex flex-col gap-5">
@@ -85,7 +81,8 @@ const Purchar = () => {
                                 <button
                                     key={index}
                                     onClick={() => {
-                                        setArr(el.size);
+                                        console.log(el.colors[0].color)
+                                        setcolor(el.colors);
                                     }}
                                     className={`w-14 h-12 ${arr==el.size ? "border-0 bg-green-300 text-white" : "outline-none bg-[#ededed]"} active::outline-none rounded`}
                                 >
@@ -111,11 +108,11 @@ const Purchar = () => {
                         </div>
                     </div>
                 </div>
-                 <div className="bg-[#f9f9f9] p-5 w-full h-full flex flex-col rounded-md shadow-md">
+                {color!=''&&<div className="bg-[#f9f9f9] p-5 w-full h-full flex flex-col rounded-md shadow-md">
                     <div className="font-bold text-lg mb-2 flex justify-between w-full">
                         <div>Pricing and Stock</div>
                         <div className="w-1/2 flex flex-row gap-3 ">
-                            {color.map((el,index)=><button key={index} className={`w-10 h-10 text-xs flex items-center bg-${el}-400`}></button>)}
+                            {color.map((el,index)=><button key={index} className={`w-10 h-10 text-xs flex items-center bg-[${el.color}]`} style={{backgroundColor:el.color}}></button>)}
                         </div>
                     </div>
                     <div className="flex flex-col justify-between gap-5">
@@ -128,7 +125,8 @@ const Purchar = () => {
                             <div className="h-full w-full items-center justify-center">Giá của sản phẩm</div>
                         </div>
                     </div>
-                </div>   
+                </div>}
+                    
                 </div>
                  <div className="bg-[#f9f9f9] p-5 w-full h-full justify-between flex flex-col rounded-md shadow-md">
                   <div className="flex w-[400px] flex-col gap-3">
