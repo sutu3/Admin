@@ -1,16 +1,18 @@
-import { faShop } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { useLocation } from "react-router-dom";
-import { product } from "../Redux/selector.jsx";
-import CreatePurchaseItem from "../Redux/PurchaseSlice.jsx";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { product, purchaseitem, PurchaseOrder } from "../Redux/selector.jsx";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
 import {
   Button,
   Checkbox,
   Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
   Table,
   TableBody,
   TableCell,
@@ -18,7 +20,10 @@ import {
   TableHeader,
   TableRow,
   Textarea,
+  useDisclosure,
 } from "@nextui-org/react";
+import PurchaseSlice, { PurchaseItem } from "../Redux/PurchaseSlice.jsx";
+import { faShop } from "@fortawesome/free-solid-svg-icons";
 const columns = [
   { name: "", uid: "checkbox" }, // Thêm cột cho checkbox
   { name: "Varient", uid: "varient" },
@@ -26,28 +31,61 @@ const columns = [
   { name: "Quanlity", uid: "quanlity" },
   { name: "Price", uid: "price" },
 ];
-const data = [
-  {
-    varient: "M/red",
-    name: "T-Shirt",
-    quanlity: 10,
-    price: 100000,
-  },
-];
 
 const Purchar = () => {
-    const dispatch=useDispatch()
+    const { isOpen, onOpen, onClose } = useDisclosure();
+  const OrderPurchase = useSelector(PurchaseOrder);
+  const OrderPrepare = OrderPurchase.filter((el) => el.status == "Prepare");
+  const list =
+    OrderPrepare.length != 0 ? OrderPrepare[0].purchaseorderitem : [];
+  console.log(list);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const id =
     useLocation().pathname.split("/")[
       useLocation().pathname.split("/").length - 1
     ];
+  const Item = useSelector(purchaseitem).find((el) => el.productid == id);
+  const item = Item ? Item.details : [];
   const Product = useSelector(product);
   const [color, setcolor] = useState([]);
   const [color1, setcolor1] = useState({});
+  const [selected, setSelected] = useState([]);
   const [basePrice, setbasePrice] = useState("");
   const [quanlity, setquanlity] = useState("");
+  console.log(quanlity);
   const [loading, setloading] = useState(false);
-  const hanldclickadd = async() => {
+  const [loading1, setloading1] = useState(false);
+  const handleDelete=async()=>{
+    list.length!=0?
+    await dispatch():await dispatch()
+  }
+  const handleCreatePurcharItem = async () => {
+    if (item.length == 0) {
+      toast.error(`Item has been Empty`, {
+        position: "top-right",
+        autoClose: 2000, // Close after 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    } else {
+      setloading1(true);
+      await dispatch(
+        PurchaseItem({
+          product: dataProduct[0].product_id,
+          version_name: dataProduct[0].name,
+          quanlity_in_stock: 2,
+          // tổng số lượng của các product,
+        })
+      );
+      setloading1(false);
+      navigate("/Product/Add");
+    }
+  };
+  const hanldclickadd = async () => {
     setloading(true);
     if (color.length == 0) {
       setloading(false);
@@ -84,14 +122,83 @@ const Purchar = () => {
             draggable: true,
             progress: undefined,
           });
-        }
-        else{
-            await dispatch(CreatePurchaseItem({
-                product:dataProduct[0].product_id,
-                version_name:dataProduct[0].name,
-                quantity_in_stock:2
-                // tổng số lượng của các product,
-            }))
+        } else {
+          const data = dataProduct[0].categories.find(
+            (el1) => el1.sizeEnum == arr && el1.color == color1.color
+          );
+          console.log(data);
+          const index =
+            list.length == 0
+              ? list.findIndex(
+                  (el) =>
+                    (el.color = data.color && el.sizeEnum == data.sizeEnum)
+                )
+              : item.findIndex(
+                  (el) => el.color == data.color && el.size == data.sizeEnum
+                );
+          console.log(index);
+          if (index != -1) {
+            setloading(true);
+            await dispatch(
+              PurchaseSlice.actions.updateQuality({
+                index: index,
+                productid: id,
+                quanlity: quanlity,
+              })
+            );
+            setloading(false);
+            toast.success(
+              `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Update quanlity`,
+              {
+                position: "top-right",
+                autoClose: 1500, // Close after 1 second
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+            setloading(false);
+          } else {
+            setloading(false);
+            console.log(quanlity);
+            await dispatch(
+              PurchaseSlice.actions.addPurchase({
+                category_id: dataProduct[0].categories.find(
+                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                ).category_id,
+                productid: dataProduct[0].product_id,
+                name: dataProduct[0].name,
+                colorid: dataProduct[0].categories.find(
+                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                ).catetoryColor,
+                sizeid: dataProduct[0].categories.find(
+                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                ).catetorySize,
+                color: color1.color,
+                size: arr,
+                price_base: dataProduct[0].categories.find(
+                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                ).price_base,
+                quanlity: quanlity,
+              })
+            );
+            setloading(true);
+            toast.success(
+              `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Create`,
+              {
+                position: "top-right",
+                autoClose: 1500, // Close after 1 second
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+            setloading(false);
+          }
         }
       }
     }
@@ -103,12 +210,19 @@ const Purchar = () => {
     <div className="w-full h-full flex flex-col gap-5">
       <div className="w-full h-[50px] flex flex-row justify-between">
         <div className="flex items-center gap-2 text-2xl font-bold">
-          <FontAwesomeIcon icon={faShop} className="pr-3" />
+          <FontAwesomeIcon
+            icon={faShop}
+            onClick={() => {
+              navigate("/Product/Add");
+            }}
+            className="pr-3 hover:text-[#74c0fc] transition duration-200 ease-in-out"
+          />
           Import Product
         </div>
         <div className="flex flex-row h-full gap-2 mr-5 items-center">
           <Button
             radius="full"
+            onPress={onOpen}
             className={`shadow-lg bg-white text-red-400 border-[3px] border-red-400 hover:text-white hover:bg-red-400 hover:border-white text-sm`}
           >
             Delete Import
@@ -274,6 +388,7 @@ const Purchar = () => {
                     <button
                       key={index}
                       onClick={() => {
+                        console.log(el)
                         setcolor1(el);
                       }}
                       className={`w-10 h-10 text-xs flex items-center bg-[${el.color}]`}
@@ -312,7 +427,7 @@ const Purchar = () => {
                     <Input
                       disabled
                       value={
-                        color1.color ? color1.variants[0].quantity_in_stock : ""
+                        color1.color ? color1.variants[0].quanlity_in_stock : ""
                       }
                       className={
                         "bg-[#eeeeee] border-2 w-[300px] border-slate-300 rounded-lg"
@@ -320,7 +435,7 @@ const Purchar = () => {
                       type="text"
                       label={
                         <span className="pb-8  inline-block">
-                          Stock in Store
+                          Stock in Store /300
                         </span>
                       }
                       placeholder="your Stock in Store"
@@ -341,7 +456,7 @@ const Purchar = () => {
                       label={
                         <span className="pb-8  inline-block">Quanlity</span>
                       }
-                      placeholder="Enter your Quantity"
+                      placeholder="Enter your quanlity"
                     />
                   </div>
                   <div className="h-full w-full items-center justify-center">
@@ -358,7 +473,22 @@ const Purchar = () => {
           )}
         </div>
         <div className="bg-[#f9f9f9] p-5 w-full h-full justify-between flex flex-col rounded-md shadow-md">
-          <div className="flex w-[400px] flex-col gap-3">
+          <div className="flex w-[500px] flex-col gap-3">
+            <Button
+              onPress={() => {
+                if (list.length != 0) {
+                  const arr1 = list.map((el) => el.purchase_order_items_id);
+                  setSelected(arr1);
+                } else {
+                  const arr1 = item.map((el, index) => index);
+                  setSelected(arr1);
+                }
+              }}
+              radius="lg"
+              className={`border-2 p-2 border-[#5eb2f6] bg-[#FFFFFF] font-mono w-28 hover:border-white text-[#1A202C] text-sm hover:text-white  hover:bg-[#88c1ff]`}
+            >
+              Select All
+            </Button>
             <Table
               color={"secondary"}
               selectionMode="single"
@@ -378,25 +508,180 @@ const Purchar = () => {
                 )}
               </TableHeader>
               <TableBody>
-                {data.map((el, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Checkbox isSelected={false} />
-                    </TableCell>
-                    <TableCell>{el.varient}</TableCell>
-                    <TableCell>{el.name}</TableCell>
-                    <TableCell>{el.quanlity}</TableCell>
-                    <TableCell>{el.price}</TableCell>
-                  </TableRow>
-                ))}
+                {list.length != 0
+                  ? list.map((el, index) => (
+                      <TableRow
+                        key={index}
+                        className="hover:bg-blue-100"
+                        onClick={() => {
+                          const colors = dataProduct[0].sizes.filter(el1 => el1.size === el.sizeEnum)
+                          const color=colors[0].colors.filter((el1)=>el1.color==el.color)
+                          console.log(color)
+                          setcolor(colors[0].colors);
+                          setcolor1(color[0]);
+                          setbasePrice(el.purchase_price);
+                          setquanlity(el.quantity);
+                          setArr(el.sizeEnum);
+                          if (selected.includes(el.purchase_order_items_id)) {
+                            setSelected(
+                              selected.filter(
+                                (el1) => el1 != el.purchase_order_items_id
+                              )
+                            );
+                          } else {
+                            setSelected([
+                              ...selected,
+                              el.purchase_order_items_id,
+                            ]);
+                          }
+                        }}
+                      >
+                        <TableCell>
+                          <Checkbox
+                            isSelected={selected.includes(
+                              el.purchase_order_items_id
+                            )}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {el.sizeEnum}/{el.color}
+                        </TableCell>
+                        <TableCell>{dataProduct[0].name}</TableCell>
+                        <TableCell>{el.quantity}</TableCell>
+                        <TableCell>{el.purchase_price}</TableCell>
+                      </TableRow>
+                    ))
+                  : item.map((el, index) => (
+                      <TableRow
+                        key={index}
+                        onClick={() => {
+                          if (selected.includes(index)) {
+                            setSelected(selected.filter((el1) => el1 != index));
+                          } else {
+                            setSelected([...selected, index]);
+                          }
+                        }}
+                      >
+                        <TableCell>
+                          <Checkbox isSelected={selected.includes(index)} />
+                        </TableCell>
+                        <TableCell>
+                          {el.size}/{el.color}
+                        </TableCell>
+                        <TableCell>{dataProduct[0].name}</TableCell>
+                        <TableCell>{el.quanlity}</TableCell>
+                        <TableCell>{el.price_base}</TableCell>
+                      </TableRow>
+                    ))}
               </TableBody>
             </Table>
           </div>
           <div>
-            <button>Create Purchase Item</button>
+            {loading1 ? (
+              <Button
+                isLoading
+                className="bg-blue-500 text-white font-bold"
+                color="secondary"
+                spinner={
+                  <svg
+                    className="animate-spin h-5 w-5 text-current"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                }
+              >
+                Loading
+              </Button>
+            ) : (
+              <Button
+                onPress={handleCreatePurcharItem}
+                radius="full"
+                className={`shadow-lg bg-white text-green-400 border-[3px] border-green-400 hover:text-white hover:bg-green-400 hover:border-white text-sm`}
+              >
+                Create Purchase Item
+              </Button>
+            )}
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onClose} // Use onClose to close the modal
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
+      >
+        <ModalContent className="bg-white border-[2px] rounded-xl border-slate-500">
+          <ModalHeader className="flex flex-col gap-1">Delete Purchase Item</ModalHeader>
+          <ModalBody>
+            <p>Delete Purchase Item</p>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="danger"
+              variant="light"
+              className="border-[2px] border-red-400 text-red-500 bg-white"
+              onPress={onClose}
+            >
+              Close
+            </Button>
+            {loading ? (
+              <Button
+                isLoading
+                className="bg-blue-500 text-white font-bold"
+                color="secondary"
+                spinner={
+                  <svg
+                    className="animate-spin h-5 w-5 text-current"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                }
+              >
+                Loading
+              </Button>
+            ) : (
+              <Button
+                color="primary"
+                className="border-[2px] border-green-400 bg-green-200 text-green-500"
+                onPress={handleDelete}
+              >
+                Action
+              </Button>
+            )}
+            {/* <ToastContainer /> */}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

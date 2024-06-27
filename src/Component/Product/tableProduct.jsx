@@ -18,11 +18,11 @@ export default function App({ setnumber, products, number, columns, setSelected,
   
   const loadingState = products.length === 0 ? "loading" : "idle";
 
-  const handleSelectAll = () => {
-    const allValues = products.map(product => product.id.toString());
-    console.log(allValues);
-    setSelected(allValues);
-  };
+  // const handleSelectAll = () => {
+  //   const allValues = products.map(product => product.id.toString());
+  //   console.log(allValues);
+  //   setSelected(allValues);
+  // };
 
   const handleCheckboxChange = (id) => {
     console.log(id)
@@ -58,13 +58,15 @@ export default function App({ setnumber, products, number, columns, setSelected,
         );
       case "quantity":
         return (
+          <Tooltip content={`${product.quantity}/300` } className={`${(product.quantity/300)*100<25?"bg-red-400":(product.quantity/300)*100>=25 &&(product.quantity/300)*100<75?"bg-yellow-400":"bg-green-400"} backdrop-blur-lg  rounded-2xl border-2 text-white`}>
           <CircularProgress
+          
       size="lg"
       value={(product.quantity/300)*100}
       color="success"
       className={`${(product.quantity/300)*100<25?"text-red-400":(product.quantity/300)*100>=25 &&(product.quantity/300)*100<75?"text-yellow-400":"text-green-400"}`}
       showValueLabel={true}
-    />
+    /></Tooltip>
         );  
       case "actions":
         return (
@@ -89,6 +91,23 @@ export default function App({ setnumber, products, number, columns, setSelected,
                 />
               </span>
             </Tooltip>
+          </div>
+        );
+        case "color":
+          return(
+            <div  className={`w-10 h-10 rounded-xl`} style={{backgroundColor:cellValue}}>
+            </div>
+          )
+        case "Fix":
+        return (
+          <div className="relative flex items-center gap-2">
+          <Link to={`${product.productid}`}>
+            <Tooltip content="Import" className="hover:bg-green-300 hover:text-white border-green-300 rounded-2xl border-2 text-green-300">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-green-300">
+               <EditIcon />
+              </span>
+            </Tooltip>
+            </Link>
           </div>
         );
         case "Plus":
@@ -122,9 +141,9 @@ export default function App({ setnumber, products, number, columns, setSelected,
 
   return (
     <div>
-      <Button onPress={handleSelectAll} className="mb-4 items-start flex">
+      {/* <Button onPress={handleSelectAll} className="mb-4 items-start flex">
         Select All
-      </Button>
+      </Button> */}
       <Table bottomContent={
         <div className="flex w-full justify-center">
           <Pagination

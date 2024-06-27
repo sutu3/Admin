@@ -42,8 +42,6 @@ export default function App({ contentButton, title, content, style }) {
       draggable: true,
       progress: undefined,
     });
-
-    
     // Add a delay of 2 seconds before showing the toast
     // 2 seconds delay before showing the toast
   };
