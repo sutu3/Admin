@@ -45,7 +45,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 const Example = () => {
   return (
-    <Card style={{  background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className={`w-[600px] h-[300px]`}>
+    <Card style={{  background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className={`w-[700px] h-[300px]`}>
       <CardHeader>
         <div style={{ color: '#ffffff', fontWeight: 'bold' }}>Biểu Đồ Thống Kê</div>
       </CardHeader>

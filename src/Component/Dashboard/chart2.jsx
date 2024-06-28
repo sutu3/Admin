@@ -15,12 +15,9 @@ const data = [
 
 const ChartComponent = () => {
   return (
-    <Card className='w-[500px]'>
-      <CardHeader>
-        <div>Biểu Đồ Thống Kê</div>
-      </CardHeader>
+    <Card className='w-[600px] '>
       <CardBody>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={300} className={"bg-[#363d68] p-2 rounded-2xl"}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />

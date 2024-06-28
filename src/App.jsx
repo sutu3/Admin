@@ -3,14 +3,14 @@ import './App.css'
 import Date from "./Component/Date/index"
 import Navbar from "./Component/Navbar/index.jsx"
 import {Outlet} from "react-router-dom"
-import { ProductFecth } from './Component/Redux/ProductSlice.jsx'
+import { FetchInfom } from './Component/Redux/ProductSlice.jsx'
 import {FetchPuchaseOrder} from './Component/Redux/PurchaseSlice.jsx'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 const App=()=> {
   const dispatch = useDispatch();
   useEffect(()=>{
-    const fetch=async()=>{await dispatch(ProductFecth())
+    const fetch=async()=>{await dispatch(FetchInfom())
       await dispatch(FetchPuchaseOrder())
     }
     fetch();

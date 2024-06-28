@@ -15,7 +15,7 @@ export default class Example extends PureComponent {
 
   render() {
     return (
-     <Card className="w-[260px] h-[260px] rounded-2xl border-none bg-gradient-to-br  from-blue-500 to-fuchsia-500">
+     <Card className="w-[400px] h-[310px] rounded-2xl border-none bg-gradient-to-br  from-blue-500 to-fuchsia-500">
       <CardBody className="justify-center items-center pb-0">
       <CardFooter className="justify-center items-center pt-0">
         <Chip
@@ -30,7 +30,7 @@ export default class Example extends PureComponent {
       </CardFooter>
         <CircularProgress
           classNames={{
-            svg: "w-52 h-52 drop-shadow-md ",
+            svg: "w-72 h-64 drop-shadow-md ",
             indicator: "stroke-white ",
             track: "stroke-white/10 ",
             value: "text-3xl font-semibold text-black",

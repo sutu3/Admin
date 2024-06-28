@@ -7,6 +7,7 @@ import { product,PurchaseOrder } from "../Redux/selector.jsx";
 import InputFind from "./Input.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDeleteLeft, faReplyAll } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 const columns = [
   // Thêm cột cho checkbox
   { name: "Product", uid: "NameProduct" },
@@ -71,9 +72,10 @@ const AddProduct = () => {
           <InputFind/>
         </div>
           <div>
+          <Link to={'/Product/AddnewProduct'}>
           <Button  radius="full" className={`shadow-lg bg-gradient-to-tr from-pink-500 to-yellow-500 text-white`}>
       + Add New Product
-    </Button>
+    </Button></Link>
           </div>
         </div>
       </div>

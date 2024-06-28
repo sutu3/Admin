@@ -22,7 +22,11 @@ import {
   Textarea,
   useDisclosure,
 } from "@nextui-org/react";
-import PurchaseSlice, { PurchaseItem } from "../Redux/PurchaseSlice.jsx";
+import PurchaseSlice, {
+  DeletePurchaseItem,
+  PurchaseItem1,
+  UpdateQuality,
+} from "../Redux/PurchaseSlice.jsx";
 import { faShop } from "@fortawesome/free-solid-svg-icons";
 const columns = [
   { name: "", uid: "checkbox" }, // Thêm cột cho checkbox
@@ -33,18 +37,20 @@ const columns = [
 ];
 
 const Purchar = () => {
-    const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const OrderPurchase = useSelector(PurchaseOrder);
   const OrderPrepare = OrderPurchase.filter((el) => el.status == "Prepare");
-  const list =
-    OrderPrepare.length != 0 ? OrderPrepare[0].purchaseorderitem : [];
-  console.log(list);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const id =
     useLocation().pathname.split("/")[
       useLocation().pathname.split("/").length - 1
     ];
+  const list =
+    OrderPrepare.length != 0
+      ? OrderPrepare[0].purchaseorderitem.filter((el) => el.productID == id)
+      : [];
+  console.log(list);
   const Item = useSelector(purchaseitem).find((el) => el.productid == id);
   const item = Item ? Item.details : [];
   const Product = useSelector(product);
@@ -56,35 +62,31 @@ const Purchar = () => {
   console.log(quanlity);
   const [loading, setloading] = useState(false);
   const [loading1, setloading1] = useState(false);
-  const handleDelete=async()=>{
-    list.length!=0?
-    await dispatch():await dispatch()
-  }
-  const handleCreatePurcharItem = async () => {
-    if (item.length == 0) {
-      toast.error(`Item has been Empty`, {
-        position: "top-right",
-        autoClose: 2000, // Close after 1 second
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
-    } else {
-      setloading1(true);
-      await dispatch(
-        PurchaseItem({
-          product: dataProduct[0].product_id,
-          version_name: dataProduct[0].name,
-          quanlity_in_stock: 2,
-          // tổng số lượng của các product,
-        })
-      );
-      setloading1(false);
-      navigate("/Product/Add");
-    }
+  const [loading2, setloading2] = useState(false);
+  const handleDelete = async () => {
+    setloading2(true);
+    selected.map(async(el)=>{
+      await dispatch(DeletePurchaseItem(el));
+    })
+    setSelected([])
+    setloading2(false)
+    onclose();
   };
+  const handleOpen=()=>{
+    if (selected.length != 0) {
+                onOpen();
+              } else {
+                toast.error("Please select product", {
+                  position: "top-right",
+                  autoClose: 1500, // Close after 1 second
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: false,
+                  draggable: true,
+                  progress: undefined,
+                });
+              }
+  }
   const hanldclickadd = async () => {
     setloading(true);
     if (color.length == 0) {
@@ -127,64 +129,33 @@ const Purchar = () => {
             (el1) => el1.sizeEnum == arr && el1.color == color1.color
           );
           console.log(data);
-          const index =
-            list.length == 0
-              ? list.findIndex(
-                  (el) =>
-                    (el.color = data.color && el.sizeEnum == data.sizeEnum)
-                )
-              : item.findIndex(
-                  (el) => el.color == data.color && el.size == data.sizeEnum
-                );
+          const index = list.findIndex(
+            (el) => el.color == data.color && el.sizeEnum == data.sizeEnum
+          );
           console.log(index);
-          if (index != -1) {
+          if (index == -1) {
             setloading(true);
             await dispatch(
-              PurchaseSlice.actions.updateQuality({
-                index: index,
-                productid: id,
-                quanlity: quanlity,
-              })
-            );
-            setloading(false);
-            toast.success(
-              `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Update quanlity`,
-              {
-                position: "top-right",
-                autoClose: 1500, // Close after 1 second
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: true,
-                progress: undefined,
-              }
-            );
-            setloading(false);
-          } else {
-            setloading(false);
-            console.log(quanlity);
-            await dispatch(
-              PurchaseSlice.actions.addPurchase({
-                category_id: dataProduct[0].categories.find(
+              PurchaseItem1({
+                product: dataProduct[0].product_id,
+                version_name: dataProduct[0].name,
+                price_base: dataProduct[0].categories.find(
                   (el1) => el1.sizeEnum == arr && el1.color == color1.color
-                ).category_id,
-                productid: dataProduct[0].product_id,
-                name: dataProduct[0].name,
+                ).price_base,
+                quanlity_in_stock:
+                  list.reduce((acc, el) => {
+                    return acc + el.quantity;
+                  }, 0) + parseInt(quanlity),
                 colorid: dataProduct[0].categories.find(
                   (el1) => el1.sizeEnum == arr && el1.color == color1.color
                 ).catetoryColor,
                 sizeid: dataProduct[0].categories.find(
                   (el1) => el1.sizeEnum == arr && el1.color == color1.color
                 ).catetorySize,
-                color: color1.color,
-                size: arr,
-                price_base: dataProduct[0].categories.find(
-                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
-                ).price_base,
                 quanlity: quanlity,
               })
             );
-            setloading(true);
+            setloading(false);
             toast.success(
               `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Create`,
               {
@@ -197,6 +168,48 @@ const Purchar = () => {
                 progress: undefined,
               }
             );
+            setloading(false);
+          } else {
+            const item1 = list[index];
+            console.log(item1);
+            setloading(false);
+
+            await dispatch(
+              UpdateQuality({
+                productVersion: item1.productVersion,
+                version_name: item1.version_name,
+                colorID: dataProduct[0].categories.find(
+                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                ).catetoryColor,
+                sizeID: dataProduct[0].categories.find(
+                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                ).catetorySize,
+                quantity_in_stock:
+                  list.reduce((acc, el) => {
+                    return acc + el.quantity;
+                  }, 0) + parseInt(quanlity - item1.quantity),
+                product: item1.productID,
+                purchase_order_items_id: item1.purchase_order_items_id,
+                quantity: quanlity,
+                purchase_price: item1.purchase_price,
+                purchaseOrder: item1.purchaseOrder,
+                variant: item1.variant,
+              })
+            );
+            setloading(true);
+            toast.success(
+              `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Update quanlity`,
+              {
+                position: "top-right",
+                autoClose: 1500, // Close after 1 second
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+
             setloading(false);
           }
         }
@@ -222,7 +235,7 @@ const Purchar = () => {
         <div className="flex flex-row h-full gap-2 mr-5 items-center">
           <Button
             radius="full"
-            onPress={onOpen}
+            onPress={handleOpen}
             className={`shadow-lg bg-white text-red-400 border-[3px] border-red-400 hover:text-white hover:bg-red-400 hover:border-white text-sm`}
           >
             Delete Import
@@ -388,7 +401,7 @@ const Purchar = () => {
                     <button
                       key={index}
                       onClick={() => {
-                        console.log(el)
+                        console.log(el);
                         setcolor1(el);
                       }}
                       className={`w-10 h-10 text-xs flex items-center bg-[${el.color}]`}
@@ -479,9 +492,6 @@ const Purchar = () => {
                 if (list.length != 0) {
                   const arr1 = list.map((el) => el.purchase_order_items_id);
                   setSelected(arr1);
-                } else {
-                  const arr1 = item.map((el, index) => index);
-                  setSelected(arr1);
                 }
               }}
               radius="lg"
@@ -508,114 +518,51 @@ const Purchar = () => {
                 )}
               </TableHeader>
               <TableBody>
-                {list.length != 0
-                  ? list.map((el, index) => (
-                      <TableRow
-                        key={index}
-                        className="hover:bg-blue-100"
-                        onClick={() => {
-                          const colors = dataProduct[0].sizes.filter(el1 => el1.size === el.sizeEnum)
-                          const color=colors[0].colors.filter((el1)=>el1.color==el.color)
-                          console.log(color)
-                          setcolor(colors[0].colors);
-                          setcolor1(color[0]);
-                          setbasePrice(el.purchase_price);
-                          setquanlity(el.quantity);
-                          setArr(el.sizeEnum);
-                          if (selected.includes(el.purchase_order_items_id)) {
-                            setSelected(
-                              selected.filter(
-                                (el1) => el1 != el.purchase_order_items_id
-                              )
-                            );
-                          } else {
-                            setSelected([
-                              ...selected,
-                              el.purchase_order_items_id,
-                            ]);
-                          }
-                        }}
-                      >
-                        <TableCell>
-                          <Checkbox
-                            isSelected={selected.includes(
-                              el.purchase_order_items_id
-                            )}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          {el.sizeEnum}/{el.color}
-                        </TableCell>
-                        <TableCell>{dataProduct[0].name}</TableCell>
-                        <TableCell>{el.quantity}</TableCell>
-                        <TableCell>{el.purchase_price}</TableCell>
-                      </TableRow>
-                    ))
-                  : item.map((el, index) => (
-                      <TableRow
-                        key={index}
-                        onClick={() => {
-                          if (selected.includes(index)) {
-                            setSelected(selected.filter((el1) => el1 != index));
-                          } else {
-                            setSelected([...selected, index]);
-                          }
-                        }}
-                      >
-                        <TableCell>
-                          <Checkbox isSelected={selected.includes(index)} />
-                        </TableCell>
-                        <TableCell>
-                          {el.size}/{el.color}
-                        </TableCell>
-                        <TableCell>{dataProduct[0].name}</TableCell>
-                        <TableCell>{el.quanlity}</TableCell>
-                        <TableCell>{el.price_base}</TableCell>
-                      </TableRow>
-                    ))}
+                {list.map((el, index) => (
+                  <TableRow
+                    key={index}
+                    className="hover:bg-blue-100"
+                    onClick={() => {
+                      const colors = dataProduct[0].sizes.filter(
+                        (el1) => el1.size === el.sizeEnum
+                      );
+                      const color = colors[0].colors.filter(
+                        (el1) => el1.color == el.color
+                      );
+                      console.log(color);
+                      setcolor(colors[0].colors);
+                      setcolor1(color[0]);
+                      setbasePrice(el.purchase_price);
+                      setquanlity(el.quantity);
+                      setArr(el.sizeEnum);
+                      if (selected.includes(el.purchase_order_items_id)) {
+                        setSelected(
+                          selected.filter(
+                            (el1) => el1 != el.purchase_order_items_id
+                          )
+                        );
+                      } else {
+                        setSelected([...selected, el.purchase_order_items_id]);
+                      }
+                    }}
+                  >
+                    <TableCell>
+                      <Checkbox
+                        isSelected={selected.includes(
+                          el.purchase_order_items_id
+                        )}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      {el.sizeEnum}/{el.color}
+                    </TableCell>
+                    <TableCell>{dataProduct[0].name}</TableCell>
+                    <TableCell>{el.quantity}</TableCell>
+                    <TableCell>{el.purchase_price}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
-          </div>
-          <div>
-            {loading1 ? (
-              <Button
-                isLoading
-                className="bg-blue-500 text-white font-bold"
-                color="secondary"
-                spinner={
-                  <svg
-                    className="animate-spin h-5 w-5 text-current"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      fill="currentColor"
-                    />
-                  </svg>
-                }
-              >
-                Loading
-              </Button>
-            ) : (
-              <Button
-                onPress={handleCreatePurcharItem}
-                radius="full"
-                className={`shadow-lg bg-white text-green-400 border-[3px] border-green-400 hover:text-white hover:bg-green-400 hover:border-white text-sm`}
-              >
-                Create Purchase Item
-              </Button>
-            )}
           </div>
         </div>
       </div>
@@ -626,9 +573,28 @@ const Purchar = () => {
         isKeyboardDismissDisabled={true}
       >
         <ModalContent className="bg-white border-[2px] rounded-xl border-slate-500">
-          <ModalHeader className="flex flex-col gap-1">Delete Purchase Item</ModalHeader>
+          <ModalHeader className="flex flex-col gap-1">
+            Do you want to delete Item
+          </ModalHeader>
           <ModalBody>
-            <p>Delete Purchase Item</p>
+            <div>
+              {list.map(
+                (el) =>
+                  selected.includes(el.purchase_order_items_id) && (
+                    <div
+                      key={el.purchase_order_items_id}
+                      className="border-b-2 border-slate-300"
+                    >
+                      <p>Name: {el.nameProduct}</p>
+                      <p> id: {el.purchase_order_items_id}</p>
+                      <p>
+                        size/Color: {el.sizeEnum}/{el.color}
+                      </p>
+                      <p>quantity: {el.quantity}</p>
+                    </div>
+                  )
+              )}
+            </div>
           </ModalBody>
           <ModalFooter>
             <Button
@@ -639,7 +605,7 @@ const Purchar = () => {
             >
               Close
             </Button>
-            {loading ? (
+            {loading2 ? (
               <Button
                 isLoading
                 className="bg-blue-500 text-white font-bold"
@@ -675,7 +641,7 @@ const Purchar = () => {
                 className="border-[2px] border-green-400 bg-green-200 text-green-500"
                 onPress={handleDelete}
               >
-                Action
+                DELETE ALL
               </Button>
             )}
             {/* <ToastContainer /> */}

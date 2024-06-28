@@ -60,17 +60,20 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 const value = () => {
   return (
-    <div className=" w-[95%]  h-full flex flex-col gap-1">
-    <div className=" w-full h-full flex flex-row gap-3">
-    <div  className=" w-full h-full flex flex-col gap-3">
-        <div className="flex flex-row w-full gap-5 justify-around">
-        <Card
+    <div className=" w-[95%]  h-full flex flex-col gap-1 mt-5">
+    <div className="flex flex-row w-full justify-around">
+      <div className="w-full m-auto  ml-10 justify-end items-center">
+          <Pie />
+        </div>
+      <div className="flex flex-col mr-5 gap-5 w-full h-full">
+        <div  className="flex gap-5 flex-row w-full">
+          <Card
           text={"white"}
           number={180}
           value={65}
           icon={faBarsStaggered}
           content={"Total Money"}
-          bg={"slate-600"}
+          bg={"[#363d68]"}
           color={"bg-slate-200"}
         />
         <Card
@@ -82,7 +85,9 @@ const value = () => {
           bg={"[#fcfcfc]"}
           color={"bg-[#e2d7ff]"}
         />
-        <Card
+        </div>
+        <div className="flex gap-5 flex-row w-full">
+           <Card
           text={"slate-700"}
           number={240}
           value={80}
@@ -100,10 +105,11 @@ const value = () => {
           bg={"[#fcfcfc]"}
           color={"bg-[#2d9bda]"}
         />
+
+        </div>
       </div>
     </div>
-    </div>
-    <div className="w-[95%] h-full flex flex-row gap-2 justify-between items-center m-auto">
+      <div className="w-[95%] h-full flex flex-row gap-2 justify-between items-center m-auto">
       <div>
         <Chart1 />
       </div>
@@ -111,14 +117,9 @@ const value = () => {
         <Chart />
       </div>
     </div>
-    <div className="w-full h-full flex flex-row gap-5 justify-between">
-        <div className="w-[700px]">
+      <div className="w-[700px] translate-x-10">
           <Table rows={topSellingProducts} columns={columns1} />
         </div>
-        <div className="w-full m-auto  ml-20 justify-end items-center">
-          <Pie />
-        </div>
-      </div>
     </div>
   );
 };
