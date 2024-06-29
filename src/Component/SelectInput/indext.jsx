@@ -5,7 +5,7 @@ const Container = styled.div`
   position: relative;
   width: 250px;
   height: 16px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(20px);
   border-radius: 20px;
   padding-top: 20px; /* Add padding to push the content down */
 `;

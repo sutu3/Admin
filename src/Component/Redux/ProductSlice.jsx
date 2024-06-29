@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { json } from "react-router-dom";
 const url1="http://26.232.136.42:8080/api"
 const ProductSlice = createSlice({
   name: "product",
@@ -7,7 +8,8 @@ const ProductSlice = createSlice({
     product:[],
     color:[],
     size:[],
-    type:[]
+    type:[],
+    gender:[]
   },
   reducers: {
     
@@ -78,6 +80,9 @@ const ProductSlice = createSlice({
       .addCase(TypeOfProductFecth.fulfilled,(state, action)=>{
         state.type=action.payload
       })
+      .addCase(TypeOfGenderFecth.fulfilled,(state, action)=>{
+        state.gender=action.payload
+      })
   },
 });
 export const FetchInfom=()=>{
@@ -86,12 +91,13 @@ export const FetchInfom=()=>{
     await dispatch(ColorFecth())
     await dispatch(SizeFecth())
     await dispatch(TypeOfProductFecth())
+    await dispatch(TypeOfGenderFecth())
   }
 } 
 export const TypeOfProductFecth=createAsyncThunk(
   "product/TypeOfProductFecth",
   async () => {
-    const res = await fetch(`${url1}/product/typeofproductOnly`, {
+    const res = await fetch(`${url1}/product/typeOnly`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -99,6 +105,17 @@ export const TypeOfProductFecth=createAsyncThunk(
     const data = await res.json();
     return data;
   })
+export const TypeOfGenderFecth=createAsyncThunk(
+  "product/TypeOfGenderFecth",
+  async () => {
+    const res = await fetch(`${url1}/product/typeGenderOnly`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    return data;
+  })  
 export const ColorFecth=createAsyncThunk(
   "product/ColorFecth",
   async () => {
@@ -120,7 +137,8 @@ export const SizeFecth=createAsyncThunk(
     });
     const data = await res.json();
     return data;
-  })  
+  }) 
+
 export const ProductFecth=createAsyncThunk(
   "product/ProductFecth",
   async () => {
@@ -133,4 +151,15 @@ export const ProductFecth=createAsyncThunk(
     return data;
   })
 
+export const Test=createAsyncThunk(
+  "product/Test",
+  async (payload) => {
+    console.log(payload);
+    const res = await fetch(`http://26.232.136.42:8080/api/variant/creatImage`, {
+      method:"POST",
+      body: payload,
+    });
+    const data = await res.text();
+    return data;
+  })
 export default ProductSlice;
