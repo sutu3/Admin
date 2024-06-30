@@ -93,8 +93,8 @@ const AddProduct = () => {
                 name: el.name,
                 gender:el.gender,
                 material:el.materialProduct,
-                avatar: el.productVersion[0]
-                  ? el.productVersion[0].variants[0].images[0].image_urlString
+                avatar: el.imagesMap.length!=0
+                  ? el.imagesMap[0].image_urlString
                   : "",
                 quantity: el.productVersion[0]
                   ? el.productVersion[0].variants.reduce((acc, variant) => acc + variant.quantity_in_stock, 0)
@@ -108,7 +108,8 @@ const AddProduct = () => {
                 <Button endContent={<FontAwesomeIcon icon={faReplyAll} />} className="border-2 border-[#5eb2f6] bg-[#FFFFFF] font-mono hover:border-white text-[#1A202C] text-sm hover:text-white  hover:bg-[#88c1ff]">Select All</Button>
                 <Button endContent={<FontAwesomeIcon icon={faDeleteLeft} />}className="border-2 border-[#f6615e] bg-[#FFFFFF] font-mono hover:border-white text-[#1A202C] text-sm hover:text-white hover:bg-[#ff8888]">Delete</Button>
               </div>
-              <div className="w-full"><TableProduct
+              <div className="w-full">
+              <TableProduct
             
             setnumber={setCurrentPage1}
             selected={selected}

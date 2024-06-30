@@ -109,6 +109,7 @@ const PurchaseSlice = createSlice({
           JSON.stringify(state.OrderPurchase)
         );
       })
+      
       .addCase(FetchPuchaseOrder.fulfilled, (state, action) => {
         state.OrderPurchase = action.payload;
         const index1 = state.OrderPurchase.findIndex(
@@ -173,7 +174,7 @@ const PurchaseSlice = createSlice({
                   purchaseorderitem: state.OrderPurchase[
                     index
                   ].purchaseorderitem.filter((el1) =>
-                    el1.purchase_order_items_id != action.payload.purchase_order_items_id
+                    el1.purchase_order_items_id != action.payload
                   ),
                 }
               : el
@@ -528,7 +529,6 @@ export const CreatePurchaseItem = createAsyncThunk(
         method: "POST",
         body: JSON.stringify(payload),
       });
-
       if (!res.ok) {
         const error = await res.json();
         toast.error(
@@ -567,6 +567,7 @@ export const CreatePurchaseItem = createAsyncThunk(
 export const PurchaseItem1 = (payload) => {
   return async function Check(dispatch, getState) {
     let id;
+    console.log(payload)
     try {
       const check = await dispatch(
         CheckVersionIdHasCreate({
@@ -581,7 +582,7 @@ export const PurchaseItem1 = (payload) => {
           UpdateQualityOfVersion({
             productVersion_id: id,
             version_name: payload.version_name,
-            quantity_in_stock: payload.quantity_in_stock,
+            quantity_in_stock: payload.quanlity_in_stock,
             productID: payload.product,
           })
         ).unwrap(); // Ensure this dispatch is awaited correctly
@@ -635,4 +636,58 @@ export const CheckVersionIdHasCreate = createAsyncThunk(
     return data;
   }
 );
+export const DeleteVarient = createAsyncThunk(
+  "purchase/CreatePurchaseItem",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/puchase/deletevariant/${payload}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else {
+        toast.success(`Varient Item Delete Complete`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const Delete=(payload)=>{
+   return async function Check(dispatch, getState){
+   const arr= getState().purchase.OrderPurchase.filter((el)=>
+     el.status=='Prepare'        
+  )[0].purchaseorderitem
+   arr.map(async(el)=>{if(payload.includes(el.purchase_order_items_id))
+      {
+        await dispatch(DeleteVarient(el.variant))
+        await dispatch(DeletePurchaseItem(el.purchase_order_items_id))
+      }})
+  }
+}
 export default PurchaseSlice;

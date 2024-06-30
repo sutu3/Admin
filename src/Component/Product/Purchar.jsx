@@ -23,6 +23,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import PurchaseSlice, {
+  Delete,
   DeletePurchaseItem,
   PurchaseItem1,
   UpdateQuality,
@@ -55,7 +56,8 @@ const Purchar = () => {
   const item = Item ? Item.details : [];
   const Product = useSelector(product);
   const [color, setcolor] = useState([]);
-  const [color1, setcolor1] = useState({});
+  const [color1, setcolor1] = useState("");
+  const [size, setsize] = useState([]);
   const [selected, setSelected] = useState([]);
   const [basePrice, setbasePrice] = useState("");
   const [quanlity, setquanlity] = useState("");
@@ -65,28 +67,26 @@ const Purchar = () => {
   const [loading2, setloading2] = useState(false);
   const handleDelete = async () => {
     setloading2(true);
-    selected.map(async(el)=>{
-      await dispatch(DeletePurchaseItem(el));
-    })
-    setSelected([])
-    setloading2(false)
+    await dispatch(Delete(selected));
+    setSelected([]);
+    setloading2(false);
     onclose();
   };
-  const handleOpen=()=>{
+  const handleOpen = () => {
     if (selected.length != 0) {
-                onOpen();
-              } else {
-                toast.error("Please select product", {
-                  position: "top-right",
-                  autoClose: 1500, // Close after 1 second
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: false,
-                  draggable: true,
-                  progress: undefined,
-                });
-              }
-  }
+      onOpen();
+    } else {
+      toast.error("Please select product", {
+        position: "top-right",
+        autoClose: 1500, // Close after 1 second
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
   const hanldclickadd = async () => {
     setloading(true);
     if (color.length == 0) {
@@ -101,7 +101,7 @@ const Purchar = () => {
         progress: undefined,
       });
     } else {
-      if (!color1.color) {
+      if (!color1) {
         setloading(false);
         toast.info("You Must be choose Color to create purchase", {
           position: "top-right",
@@ -125,9 +125,7 @@ const Purchar = () => {
             progress: undefined,
           });
         } else {
-          const data = dataProduct[0].categories.find(
-            (el1) => el1.sizeEnum == arr && el1.color == color1.color
-          );
+          const data = dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1))[0]
           console.log(data);
           const index = list.findIndex(
             (el) => el.color == data.color && el.sizeEnum == data.sizeEnum
@@ -139,25 +137,19 @@ const Purchar = () => {
               PurchaseItem1({
                 product: dataProduct[0].product_id,
                 version_name: dataProduct[0].name,
-                price_base: dataProduct[0].categories.find(
-                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
-                ).price_base,
+                price_base: dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1))[0].price_base,
                 quanlity_in_stock:
                   list.reduce((acc, el) => {
                     return acc + el.quantity;
                   }, 0) + parseInt(quanlity),
-                colorid: dataProduct[0].categories.find(
-                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
-                ).catetoryColor,
-                sizeid: dataProduct[0].categories.find(
-                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
-                ).catetorySize,
+                colorid: dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1))[0].catetoryColor,
+                sizeid: dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1))[0].catetorySize,
                 quanlity: quanlity,
               })
             );
             setloading(false);
             toast.success(
-              `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Create`,
+              `Product ${dataProduct[0].name} Size ${arr}/${color1} has been Create`,
               {
                 position: "top-right",
                 autoClose: 1500, // Close after 1 second
@@ -179,10 +171,10 @@ const Purchar = () => {
                 productVersion: item1.productVersion,
                 version_name: item1.version_name,
                 colorID: dataProduct[0].categories.find(
-                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                  (el1) => el1.sizeEnum == arr && el1.color == color1
                 ).catetoryColor,
                 sizeID: dataProduct[0].categories.find(
-                  (el1) => el1.sizeEnum == arr && el1.color == color1.color
+                  (el1) => el1.sizeEnum == arr && el1.color == color1
                 ).catetorySize,
                 quantity_in_stock:
                   list.reduce((acc, el) => {
@@ -198,7 +190,7 @@ const Purchar = () => {
             );
             setloading(true);
             toast.success(
-              `Product ${dataProduct[0].name} Size ${arr}/${color1.color} has been Update quanlity`,
+              `Product ${dataProduct[0].name} Size ${arr}/${color1} has been Update quanlity`,
               {
                 position: "top-right",
                 autoClose: 1500, // Close after 1 second
@@ -217,7 +209,13 @@ const Purchar = () => {
     }
   };
   const dataProduct = Product.filter((el) => el.product_id == id);
-  const [arr, setArr] = useState("");
+  const [arr, setArr] = useState("");  
+  console.log(color1);
+  dataProduct[0].categories.map((el) => {
+    if (!size.includes(el.sizeEnum)) {
+      setsize([...size, el.sizeEnum]);
+    }
+  });
 
   return (
     <div className="w-full h-full flex flex-col gap-5">
@@ -322,24 +320,32 @@ const Purchar = () => {
                   Pink Available Size
                 </div>
                 <div className="flex flex-row gap-3">
-                  {dataProduct[0].sizes.map((el, index) => (
+                  {size.map((el, index) => (
                     <button
                       key={index}
                       onClick={() => {
-                        console.log(el.colors[0].color);
-                        setcolor(el.colors);
+                        const color = dataProduct[0].categories.reduce(
+                          (acc, el1) => {
+                            if (el1.sizeEnum === el) {
+                              acc.push(el1.color);
+                            }
+                            return acc;
+                          },
+                          []
+                        );
+                        setcolor(color);
                         setcolor1({});
                         setbasePrice("");
                         setquanlity("");
-                        setArr(el.size);
+                        setArr(el);
                       }}
                       className={`w-14 h-12 ${
-                        arr == el.size
+                        arr == el
                           ? "border-0 bg-green-300 text-white"
                           : "outline-none bg-[#ededed]"
                       } active::outline-none rounded`}
                     >
-                      {el.size}
+                      {el}
                     </button>
                   ))}
                 </div>
@@ -396,7 +402,7 @@ const Purchar = () => {
             <div className="bg-[#f9f9f9] p-5 w-full h-full flex flex-col rounded-md shadow-md">
               <div className="font-bold text-lg mb-2 flex justify-between w-full">
                 <div>Pricing and Stock</div>
-                <div className="w-1/2 flex flex-row gap-3 ">
+                <div className="w-1/2 flex flex-row justify-start gap-3 ">
                   {color.map((el, index) => (
                     <button
                       key={index}
@@ -404,8 +410,8 @@ const Purchar = () => {
                         console.log(el);
                         setcolor1(el);
                       }}
-                      className={`w-10 h-10 text-xs flex items-center bg-[${el.color}]`}
-                      style={{ backgroundColor: el.color }}
+                      className={`w-10 h-10 text-xs flex items-center bg-[${el}]`}
+                      style={{ backgroundColor: el }}
                     ></button>
                   ))}
                 </div>
@@ -414,13 +420,7 @@ const Purchar = () => {
                 <div className=" w-full flex flex-row gap-3 justify-between">
                   <div>
                     <Input
-                      value={
-                        color1.color
-                          ? dataProduct[0].categories.find(
-                              (el1) =>
-                                el1.sizeEnum == arr && el1.color == color1.color
-                            ).price_base
-                          : 0
+                      value={(arr.length!==0&&color1.length!==0)?dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1)).length===0?0:dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1))[0].price_base:0
                       }
                       //const price=dataProduct.categories.map((el)=>el.color1==color&& el.sizeEnum && el.price_base)
                       onChange={(e) => {
@@ -526,11 +526,17 @@ const Purchar = () => {
                       const colors = dataProduct[0].sizes.filter(
                         (el1) => el1.size === el.sizeEnum
                       );
-                      const color = colors[0].colors.filter(
-                        (el1) => el1.color == el.color
-                      );
+                      const color = dataProduct[0].categories.reduce(
+                          (acc, el1) => {
+                            if (el1.sizeEnum === el.sizeEnum) {
+                              acc.push(el1.color);
+                            }
+                            return acc;
+                          },
+                          []
+                        );
                       console.log(color);
-                      setcolor(colors[0].colors);
+                      setcolor(color);
                       setcolor1(color[0]);
                       setbasePrice(el.purchase_price);
                       setquanlity(el.quantity);
