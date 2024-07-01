@@ -50,9 +50,9 @@ const AddnewProduct = () => {
   const [description, setdescription] = useState("");
   const [btn, setbtn] = useState([]);
   const [price, setprice] = useState(0);
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const fileInputRef = useRef(null);
- 
+
   const handleSelectionChangeSize = (selectedKeys) => {
     const selectedArray = Array.from(selectedKeys);
 
@@ -66,11 +66,10 @@ const AddnewProduct = () => {
       }
     });
 
-     setsize(arr);
+    setsize(arr);
   };
 
-  useEffect(() => {
-   }, [btn, imge]);
+  useEffect(() => {}, [btn, imge]);
   const handleFileUpload = () => {
     fileInputRef.current.click();
   };
@@ -107,7 +106,7 @@ const AddnewProduct = () => {
     const file = e.target.files[0];
     const formData = new FormData();
     formData.append("file", file);
-     await dispatch(Test(formData));
+    await dispatch(Test(formData));
     // if (file) {
 
     // fetch('http://localhost:3000/upload', {
@@ -214,7 +213,7 @@ const AddnewProduct = () => {
                             progress: undefined,
                           });
                         } else {
-                           if (size.find((el) => el.color.length == 0)) {
+                          if (size.find((el) => el.color.length == 0)) {
                             toast.info(`${"Choose Your Color Product"}`, {
                               position: "top-right",
                               autoClose: 2000,
@@ -506,9 +505,9 @@ const AddnewProduct = () => {
                     {size.map((el) => (
                       <Button
                         onClick={() => {
-                           if (btn.findIndex((el1) => el1 === el.size) === -1) {
+                          if (btn.findIndex((el1) => el1 === el.size) === -1) {
                             const arr = [...btn, el.size];
-                             setbtn(arr);
+                            setbtn(arr);
                           } else {
                             const arr = btn.filter((el1) => el1 !== el.size);
                             setbtn(arr);
@@ -575,7 +574,7 @@ const AddnewProduct = () => {
                       return el;
                     });
 
-                     setsize(updatedSizes);
+                    setsize(updatedSizes);
                   }}
                   className="w-56 font-[600] border-[#83a3ff] border-dashed border-2 text-[#83a3ff] bg-white"
                 >
@@ -669,7 +668,7 @@ const AddnewProduct = () => {
                         return el;
                       }
                     });
-                     setcategories(arr);
+                    setcategories(arr);
                   }}
                   className={`border-2 p-2 border-[#4d5bd4] border-dashed hover:border-solid bg-[#FFFFFF] font-mono w-28 hover:border-white text-[#1A202C] text-sm hover:text-white  hover:bg-[#4d5bd4]`}
                 >
@@ -777,7 +776,6 @@ const AddnewProduct = () => {
                     categories: categories,
                     price: price,
                     image: imge,
-                    
                   })
                 );
               }}
