@@ -175,6 +175,17 @@ const PurchaseSlice = createSlice({
           JSON.stringify(state.OrderPurchase)
         );
       })
+      .addCase(ChangeStatusToReceive.fulfilled, (state, action) => {
+        state.OrderPurchase = state.OrderPurchase.map((el) =>
+          el.purchase_orders_id == action.payload.purchase_orders_id
+            ? action.payload
+            : el
+        );
+        localStorage.setItem(
+          "orderPurchase",
+          JSON.stringify(state.OrderPurchase)
+        );
+      })
       .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
         const index1 = state.OrderPurchase.findIndex(
           (el) => el.status === "Prepare"
@@ -321,7 +332,10 @@ export const ChangeStatusToShipping = createAsyncThunk(
           "Content-Type": "application/json",
         },
         method: "PUT",
-        body: JSON.stringify({ purchase_orders_id: parseInt(payload[0].purchase_orders_id), total_amount: arr }),
+        body: JSON.stringify({
+          purchase_orders_id: parseInt(payload[0].purchase_orders_id),
+          total_amount: arr,
+        }),
       });
 
       if (!res.ok) {
@@ -521,6 +535,7 @@ export const UpdateQuality = (payload) => {
           quantity: payload.quantity,
           purchaseOrder: payload.purchaseOrder,
           variant: payload.variant,
+          quantity_real:0,
           productVersion: payload.productVersion,
           // purchase_price: payload.purchase_price,
           // quantity: payload.quantity,
@@ -740,6 +755,249 @@ export const DeleteVarient = createAsyncThunk(
     }
   }
 );
+//Đổi trạng thái của đơn hàng thành received
+export const ChangeStatusToReceive = createAsyncThunk(
+  "purchase/UpdateQuantityAndPrice",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/puchase/recevice/${payload}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else {
+        toast.success(`Change Order to Received Complete`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+//thàng này dùng để cập nhập total price của order purchase
+export const UpdateTotalPriceOrderPurchase = createAsyncThunk(
+  "purchase/UpdateTotalPriceOrderPurchase",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/puchase/update`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else {
+        toast.success(`Update Total Price complete`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const UpdateQuantityOrdetItemPurchase = createAsyncThunk(
+  "purchase/UpdateQuantityOrdetItemPurchase",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/puchase/updatePuchaseItemQuantity`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else {
+        toast.success(`Update Complete`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+//Thằng này dùng để lên giá sản phẩm và số lượng
+export const UpdateQuantityAndPrice = createAsyncThunk(
+  "purchase/UpdateQuantityAndPrice",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/sale/create`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else {
+        toast.success(`Update Complete`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+//Thằng này dùng để lên giá sản phẩm và số lượng thực tế nhận được chuyển trạng thái sang received
+export const ImportPurchase = (payload) => {
+  return async function Check(dispatch, getState) {
+    try {
+      const today = new Date();
+
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0"); // Đảm bảo tháng luôn có 2 chữ số
+      const day = String(today.getDate()).padStart(2, "0");
+      console.log(payload);
+      const idproduct = payload.data[0].productID;
+      const categories = getState().product.product.find(
+        (el) => el.product_id == idproduct
+      ).categories;
+      payload.data.map(async (el) => {
+        await dispatch(
+          UpdateQuantityAndPrice({
+            quantity: el.quantity_real,
+            sale_price: el.purchase_price,
+            variant: el.variant,
+            sale_base_price: el.price_real,
+            sale_date_start: `${year}-${month}-${day}`,
+            sale_date_end: null,
+          })
+        );
+        await dispatch(
+          UpdateQualityOfVarient({
+            variants_id: el.variant,
+            colorID: categories.find(
+              (el1) => el1.color == el1.color && el1.sizeEnum == el.sizeEnum
+            ).catetoryColor,
+            sizeID: categories.find(
+              (el1) => el1.color == el1.color && el1.sizeEnum == el.sizeEnum
+            ).catetorySize,
+            productversion: el.productVersion,
+            quantity_in_stock: el.quantity_real,
+          })
+        );
+        await dispatch(
+          UpdateQuantityOrdetItemPurchase({
+           purchase_order_items_id: el.purchase_order_items_id,
+            quantity_real: el.quantity_real,
+          })
+        );
+      });
+      await dispatch(
+        UpdateTotalPriceOrderPurchase({
+          purchase_orders_id: payload.id,
+          total_amount: payload.data.reduce(
+            (acc, el) => acc + el.quantity_real * el.purchase_price,
+            0
+          ),
+        })
+      );
+      await dispatch(ChangeStatusToReceive(payload.id));
+    } catch (error) {
+      toast.error(error, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+};
 export const Delete = (payload) => {
   return async function Check(dispatch, getState) {
     const arr = getState().purchase.OrderPurchase.filter(

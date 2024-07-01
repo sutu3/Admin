@@ -12,23 +12,16 @@ export default function App() {
   let formatter = useDateFormatter({dateStyle: "long"});
 
   return (
-    <div className="flex flex-row gap-2 backdrop-blur-lg bg-slate-400">
+    <div className="flex flex-row gap-2">
       <div className="w-full flex flex-col gap-y-2 ">
         <DateRangePicker
-        onBlur={blur}
+        // onBlur={blur}
           label="Date range (controlled)"
           value={value}
           onChange={setValue}
+          className="shadow-slate-800 shadow-inner rounded-lg bg-slate-500"
         />
-        <p className="text-default-500 text-sm">
-          Selected date:{" "}
-          {value
-            ? formatter.formatRange(
-                value.start.toDate(getLocalTimeZone()),
-                value.end.toDate(getLocalTimeZone()),
-              )
-            : "--"}
-        </p>
+       
       </div>
       
     </div>
