@@ -12,9 +12,10 @@ export default function App() {
   let formatter = useDateFormatter({dateStyle: "long"});
 
   return (
-    <div className="flex flex-row gap-2">
-      <div className="w-full flex flex-col gap-y-2">
+    <div className="flex flex-row gap-2 backdrop-blur-lg bg-slate-400">
+      <div className="w-full flex flex-col gap-y-2 ">
         <DateRangePicker
+        onBlur={blur}
           label="Date range (controlled)"
           value={value}
           onChange={setValue}

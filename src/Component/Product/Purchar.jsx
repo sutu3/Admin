@@ -51,9 +51,6 @@ const Purchar = () => {
     OrderPrepare.length != 0
       ? OrderPrepare[0].purchaseorderitem.filter((el) => el.productID == id)
       : [];
-  console.log(list);
-  const Item = useSelector(purchaseitem).find((el) => el.productid == id);
-  const item = Item ? Item.details : [];
   const Product = useSelector(product);
   const [color, setcolor] = useState([]);
   const [color1, setcolor1] = useState("");
@@ -61,20 +58,24 @@ const Purchar = () => {
   const [selected, setSelected] = useState([]);
   const [basePrice, setbasePrice] = useState("");
   const [quanlity, setquanlity] = useState("");
-  console.log(quanlity);
-  const [loading, setloading] = useState(false);
-  const [loading1, setloading1] = useState(false);
+   const [loading, setloading] = useState(false);
   const [loading2, setloading2] = useState(false);
   const handleDelete = async () => {
-    setloading2(true);
+    if (selected.length != 0) {
+      setloading2(true);
     await dispatch(Delete(selected));
+    onClose()
     setSelected([]);
     setloading2(false);
-    onclose();
-  };
-  const handleOpen = () => {
-    if (selected.length != 0) {
-      onOpen();
+    toast.success("Action Delete successfully!", {
+      position: "top-right",
+      autoClose: 2000, // Close after 1 second
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+    });
     } else {
       toast.error("Please select product", {
         position: "top-right",
@@ -86,6 +87,7 @@ const Purchar = () => {
         progress: undefined,
       });
     }
+    
   };
   const hanldclickadd = async () => {
     setloading(true);
@@ -126,11 +128,9 @@ const Purchar = () => {
           });
         } else {
           const data = dataProduct[0].categories.filter((el)=>(el.sizeEnum==arr&&el.color==color1))[0]
-          console.log(data);
           const index = list.findIndex(
             (el) => el.color == data.color && el.sizeEnum == data.sizeEnum
           );
-          console.log(index);
           if (index == -1) {
             setloading(true);
             await dispatch(
@@ -163,7 +163,6 @@ const Purchar = () => {
             setloading(false);
           } else {
             const item1 = list[index];
-            console.log(item1);
             setloading(false);
 
             await dispatch(
@@ -210,8 +209,7 @@ const Purchar = () => {
   };
   const dataProduct = Product.filter((el) => el.product_id == id);
   const [arr, setArr] = useState("");  
-  console.log(color1);
-  dataProduct[0].categories.map((el) => {
+   dataProduct[0].categories.map((el) => {
     if (!size.includes(el.sizeEnum)) {
       setsize([...size, el.sizeEnum]);
     }
@@ -232,8 +230,9 @@ const Purchar = () => {
         </div>
         <div className="flex flex-row h-full gap-2 mr-5 items-center">
           <Button
+          aria-label="Delete Item"
             radius="full"
-            onPress={handleOpen}
+            onPress={onOpen}
             className={`shadow-lg bg-white text-red-400 border-[3px] border-red-400 hover:text-white hover:bg-red-400 hover:border-white text-sm`}
           >
             Delete Import
@@ -241,6 +240,7 @@ const Purchar = () => {
           {loading ? (
             <Button
               isLoading
+              aria-label="Loading Button"
               className="bg-blue-500 text-white font-bold"
               color="secondary"
               spinner={
@@ -270,6 +270,7 @@ const Purchar = () => {
             </Button>
           ) : (
             <Button
+            aria-label="Add Item"
               onPress={hanldclickadd}
               radius="full"
               className={`shadow-lg bg-white text-green-400 border-[3px] border-green-400 hover:text-white hover:bg-green-400 hover:border-white text-sm`}
@@ -407,8 +408,7 @@ const Purchar = () => {
                     <button
                       key={index}
                       onClick={() => {
-                        console.log(el);
-                        setcolor1(el);
+                         setcolor1(el);
                       }}
                       className={`w-10 h-10 text-xs flex items-center bg-[${el}]`}
                       style={{ backgroundColor: el }}
@@ -488,6 +488,7 @@ const Purchar = () => {
         <div className="bg-[#f9f9f9] p-5 w-full h-full justify-between flex flex-col rounded-md shadow-md">
           <div className="flex w-[500px] flex-col gap-3">
             <Button
+            aria-label="Lelect All item"
               onPress={() => {
                 if (list.length != 0) {
                   const arr1 = list.map((el) => el.purchase_order_items_id);
@@ -535,8 +536,7 @@ const Purchar = () => {
                           },
                           []
                         );
-                      console.log(color);
-                      setcolor(color);
+                       setcolor(color);
                       setcolor1(color[0]);
                       setbasePrice(el.purchase_price);
                       setquanlity(el.quantity);
@@ -604,6 +604,7 @@ const Purchar = () => {
           </ModalBody>
           <ModalFooter>
             <Button
+            aria-label="Close Button"
               color="danger"
               variant="light"
               className="border-[2px] border-red-400 text-red-500 bg-white"
@@ -613,6 +614,7 @@ const Purchar = () => {
             </Button>
             {loading2 ? (
               <Button
+              aria-label="Loading Button"
                 isLoading
                 className="bg-blue-500 text-white font-bold"
                 color="secondary"
@@ -643,6 +645,7 @@ const Purchar = () => {
               </Button>
             ) : (
               <Button
+              aria-label="Delete All Item"
                 color="primary"
                 className="border-[2px] border-green-400 bg-green-200 text-green-500"
                 onPress={handleDelete}

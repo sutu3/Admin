@@ -15,6 +15,7 @@ import store from "./Component/Redux/store";
 import { ToastContainer } from "react-toastify";
 import Purchar from "./Component/Product/Purchar";
 import AddnewProduct from "./Component/Product/AddnewProduct";
+import ImportProduct from "./Component/Product/ImportProduct";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -31,7 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route path="Add"  element={<AddProduct />} >
               </Route>
               <Route path="Add/:id" element={<Purchar />} />
-              <Route path="Import"  element={<Purchar />} />
+              <Route path="Import"  element={<ImportProduct />} />
               <Route path="Addnewproduct" element={<AddnewProduct />} />
               <Route path="Update" element={<AddProduct />} />
             </Route>

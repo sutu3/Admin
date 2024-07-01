@@ -65,6 +65,18 @@ const PurchaseSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(ChangeStatusToShipping.fulfilled, (state, action) => {
+        const index1 = state.OrderPurchase.findIndex(
+          (el) => el.status === "Prepare"
+        );
+        state.OrderPurchase = state.OrderPurchase.map((el, index) =>
+          index == index1 ? action.payload : el
+        );
+        localStorage.setItem(
+          "orderPurchase",
+          JSON.stringify(state.OrderPurchase)
+        );
+      })
       .addCase(CreatePurchaseItem.fulfilled, (state, action) => {
         const specificDate = new Date();
         const formattedSpecificDate = specificDate
@@ -109,7 +121,7 @@ const PurchaseSlice = createSlice({
           JSON.stringify(state.OrderPurchase)
         );
       })
-      
+
       .addCase(FetchPuchaseOrder.fulfilled, (state, action) => {
         state.OrderPurchase = action.payload;
         const index1 = state.OrderPurchase.findIndex(
@@ -149,7 +161,8 @@ const PurchaseSlice = createSlice({
                   purchaseorderitem: state.OrderPurchase[
                     index
                   ].purchaseorderitem.map((el1) =>
-                    el1.purchase_order_items_id == action.payload.purchase_order_items_id
+                    el1.purchase_order_items_id ==
+                    action.payload.purchase_order_items_id
                       ? action.payload
                       : el1
                   ),
@@ -162,7 +175,7 @@ const PurchaseSlice = createSlice({
           JSON.stringify(state.OrderPurchase)
         );
       })
-      .addCase(DeletePurchaseItem.fulfilled,(state,action)=>{
+      .addCase(DeletePurchaseItem.fulfilled, (state, action) => {
         const index1 = state.OrderPurchase.findIndex(
           (el) => el.status === "Prepare"
         );
@@ -173,8 +186,8 @@ const PurchaseSlice = createSlice({
                   ...el,
                   purchaseorderitem: state.OrderPurchase[
                     index
-                  ].purchaseorderitem.filter((el1) =>
-                    el1.purchase_order_items_id != action.payload
+                  ].purchaseorderitem.filter(
+                    (el1) => el1.purchase_order_items_id != action.payload
                   ),
                 }
               : el
@@ -184,7 +197,7 @@ const PurchaseSlice = createSlice({
           "orderPurchase",
           JSON.stringify(state.OrderPurchase)
         );
-      })
+      });
   },
 });
 //thằng này dùng để tạo product version mới khi nhập hàng
@@ -287,6 +300,55 @@ export const CreateVariant = createAsyncThunk(
         });
       }
 
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const ChangeStatusToShipping = createAsyncThunk(
+  "purchase/ChangeStatusToShipping",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const arr = payload[0].purchaseorderitem.reduce(
+        (acc, el) => acc + el.purchase_price * el.quantity,
+        0
+      );
+      console.log(payload);
+      const res = await fetch(`${url}/puchase/compelete`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify({ purchase_orders_id: parseInt(payload[0].purchase_orders_id), total_amount: arr }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      } else {
+        toast.success(`Order Items Will Delivery on your shop`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }
       const data = await res.json();
       return data;
     } catch (error) {
@@ -501,14 +563,14 @@ export const DeletePurchaseItem = createAsyncThunk(
         );
       } else {
         toast.success("Acction Delete Complete", {
-                  position: "top-right",
-                  autoClose: 1500, // Close after 1 second
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: false,
-                  draggable: true,
-                  progress: undefined,
-                });
+          position: "top-right",
+          autoClose: 1500, // Close after 1 second
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
       }
       const data = await res.json();
       return data;
@@ -567,7 +629,7 @@ export const CreatePurchaseItem = createAsyncThunk(
 export const PurchaseItem1 = (payload) => {
   return async function Check(dispatch, getState) {
     let id;
-    console.log(payload)
+    console.log(payload);
     try {
       const check = await dispatch(
         CheckVersionIdHasCreate({
@@ -678,16 +740,17 @@ export const DeleteVarient = createAsyncThunk(
     }
   }
 );
-export const Delete=(payload)=>{
-   return async function Check(dispatch, getState){
-   const arr= getState().purchase.OrderPurchase.filter((el)=>
-     el.status=='Prepare'        
-  )[0].purchaseorderitem
-   arr.map(async(el)=>{if(payload.includes(el.purchase_order_items_id))
-      {
-        await dispatch(DeleteVarient(el.variant))
-        await dispatch(DeletePurchaseItem(el.purchase_order_items_id))
-      }})
-  }
-}
+export const Delete = (payload) => {
+  return async function Check(dispatch, getState) {
+    const arr = getState().purchase.OrderPurchase.filter(
+      (el) => el.status == "Prepare"
+    )[0].purchaseorderitem;
+    arr.map(async (el) => {
+      if (payload.includes(el.purchase_order_items_id)) {
+        await dispatch(DeleteVarient(el.variant));
+        await dispatch(DeletePurchaseItem(el.purchase_order_items_id));
+      }
+    });
+  };
+};
 export default PurchaseSlice;
