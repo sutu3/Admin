@@ -18,6 +18,7 @@ const columns = [
   {name:"Material", uid: "material" },
   { name: "Quantity", uid: "quantity" },
   { name: "Plus", uid: "Plus" },
+  { name: "Fix", uid: "Fix" },
 ];
 const columns1 = [
   // Thêm cột cho checkbox
@@ -32,6 +33,7 @@ const columns1 = [
 const AddProduct = () => {
   const dispatch=useDispatch();
   const OrderPurchase=useSelector(PurchaseOrder)
+  console.log(OrderPurchase)
     const { isOpen, onOpen, onClose } = useDisclosure();
 
   const OrderPrepare=OrderPurchase.filter((el)=>el.status=="Prepare")

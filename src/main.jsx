@@ -17,6 +17,7 @@ import Purchar from "./Component/Product/Purchar";
 import AddnewProduct from "./Component/Product/AddnewProduct";
 import ImportProduct from "./Component/Product/ImportProduct";
 import Fixproduct from "./Component/Product/Fixproduct";
+import UpdateProduct from "./Component/Product/UpdateProduct";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -34,6 +35,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               </Route>
               <Route path="Add/:id" element={<Purchar />} />
               <Route path="Import"  element={<ImportProduct />} />
+              <Route path="Add/fix/:id"  element={<UpdateProduct />} />
               <Route path="Import/:id"  element={<Fixproduct />} />
               <Route path="Addnewproduct" element={<AddnewProduct />} />
               <Route path="Update" element={<AddProduct />} />

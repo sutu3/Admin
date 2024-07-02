@@ -71,7 +71,7 @@ const ProductSlice = createSlice({
         });
       })
       .addCase(GetProduct.fulfilled, (state, action) => {
-        state.product = [...state.product, action.payload];
+         state.product = state.product.map((el)=>el.product_id==action.payload.product_id?action.payload:el);
       })
       .addCase(ColorFecth.fulfilled, (state, action) => {
         state.color = action.payload;
@@ -142,7 +142,7 @@ export const SizeFecth = createAsyncThunk("product/SizeFecth", async () => {
 export const ProductFecth = createAsyncThunk(
   "product/ProductFecth",
   async () => {
-    const res = await fetch(`${url1}/product/productshow`, {
+    const res = await fetch(`${url1}/product/productshowV2`, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -190,7 +190,67 @@ export const ColorCreate = createAsyncThunk(
         });
       }
       const data = await res.json();
-      return { ...data, color: payload };
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const UpdateCategoriesPriceORDelete = createAsyncThunk(
+  "product/UpdateCategoriesPriceORDelete",
+  async (payload, { rejectWithValue }) => {
+    console.log(payload);
+    try {
+      const res = await fetch(`${url1}/product/updatecategory`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }else{
+        if(payload.isdelete)
+          {
+toast.success(` Delete Category success`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+          }
+          else{
+            toast.success(`Update Price Category success`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+          }
+        
+      }
+      const data = await res.json();
+      return data;
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -379,13 +439,13 @@ export const GetProduct = createAsyncThunk(
   "product/GetProduct",
   async (payload) => {
     console.log(payload);
-    const res = await fetch(`${url1}/product/productshow/${payload}`, {
+    const res = await fetch(`${url1}/product/productshowV2/${payload}`, {
       headers: {
         "Content-Type": "application/json",
       },
       method: "GET",
     });
-    const data = await res.text();
+    const data = await res.json();
     return data;
   }
 );
@@ -397,7 +457,7 @@ export const CreateOfProduct = (payload) => {
         payload.categories.map(async (el) => {
           console.log(el.color);
           const idcolor = await dispatch(ColorCheck(el.color));
-          if (idcolor !== -1) {
+          if (idcolor.payload !== -1) {
             return { ...el, color: idcolor.payload };
           } else {
             const idcolorNew = await dispatch(
@@ -454,4 +514,64 @@ export const CreateOfProduct = (payload) => {
     }
   };
 };
+export const UpdateCategories=(payload)=>{
+  return async function check(dispatch, getState) {
+    try {
+ await Promise.all(payload.data.map(async (el) => {
+    console.time("ColorCheck");
+    const idcolor = await dispatch(ColorCheck(el.color));
+    console.timeEnd("ColorCheck");
+    
+    if (idcolor.payload !== -1) {
+       await dispatch(
+      CreateCateGories({
+        price_base: el.price,
+        catetoryProduct: payload.idproduct,
+        catetoryColor: idcolor.payload,
+        catetorySize: el.size,
+      })
+    );
+      return { ...el, color: idcolor.payload };
+    } else {
+      console.time("ColorCreate");
+      const idcolorNew = await dispatch(ColorCreate({ color_name: el.color }));
+      await dispatch(
+      CreateCateGories({
+        price_base: el.price,
+        catetoryProduct: payload.idproduct,
+        catetoryColor: idcolorNew.payload,
+        catetorySize: el.size,
+      })
+    );
+      console.timeEnd("ColorCreate");
+      console.log(idcolorNew);
+      return { ...el, color: idcolorNew.payload };
+    }
+  })) 
+
+
+// arr.map(async (el) => {
+//     await dispatch(
+//       CreateCateGories({
+//         price_base: el.price,
+//         catetoryProduct: payload.idproduct,
+//         catetoryColor: el.color,
+//         catetorySize: el.size,
+//       })
+//     );
+//   })
+
+      await dispatch(GetProduct(payload.idproduct));
+    } catch(error){
+      toast.error(`Update Categories Fall ${error.message}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+}}
 export default ProductSlice;

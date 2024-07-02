@@ -42,7 +42,21 @@ const Fixproduct = () => {
     (el) => el.purchase_orders_id == location
   );
   const [list, setlist] = useState(
+    Order.status=='Receive'?
     Order.purchaseorderitem.map((el) => ({
+      purchase_order_items_id: el.purchase_order_items_id,
+      version_name: el.version_name,
+      quantity: el.quantity,
+      purchase_price: el.purchase_price,
+      sizeEnum: el.sizeEnum,
+      color: el.color,
+      quantity_real: el.quantity_real,
+      Percentage:0,
+      price_real: 0,
+      variant:el.variant,
+      productID:el.productID,
+      productVersion:el.productVersion
+    })):Order.purchaseorderitem.map((el) => ({
       purchase_order_items_id: el.purchase_order_items_id,
       version_name: el.version_name,
       quantity: el.quantity,

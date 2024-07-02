@@ -101,7 +101,7 @@ export default function App({ setnumber, products, number, columns, setSelected,
         case "Fix":
         return (
           <div className="relative flex items-center gap-2">
-          <Link to={`${product.productid}`}>
+          <Link to={`/Product/Add/fix/${product.id}`}>
             <Tooltip content="Import" className="hover:bg-green-300 hover:text-white border-green-300 rounded-2xl border-2 text-green-300">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50 text-green-300">
                <EditIcon />
