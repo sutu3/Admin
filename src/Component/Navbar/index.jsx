@@ -21,7 +21,7 @@ const data = [
   },
   {
     content: "Product",
-    link: "/Product",
+    link: "/Product/Add",
     icon: faShirt,
     flat:false
   },
@@ -40,7 +40,7 @@ const data = [
   },
   {
     content: "Customer",
-    link: "/",
+    link: "/custumer",
     icon: faUser,
     flat:false
   },

@@ -6,19 +6,9 @@ import MiniNav from '../MiniNav/index.jsx'
 import { ToastContainer } from 'react-toastify';
 const data = [
   {
-    content: "List Product",
-    link: '',
-    icon: faFileImport,
-  },
-  {
     content: "Add Product",
     link: 'Add',
     icon: faFileImport,
-  },
-  {
-    content: "Update Product",
-    link: "Update",
-    icon: faPenToSquare,
   },
   {
     content: "Import Product",

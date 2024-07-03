@@ -7,11 +7,15 @@ import { FetchInfom } from './Component/Redux/ProductSlice.jsx'
 import {FetchPuchaseOrder} from './Component/Redux/PurchaseSlice.jsx'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
+import { Custumer } from './Component/Redux/CustummerSlice.jsx'
+import { OrderFetch } from './Component/Redux/OrderSlice.jsx'
 const App=()=> {
   const dispatch = useDispatch();
   useEffect(()=>{
     const fetch=async()=>{await dispatch(FetchInfom())
       await dispatch(FetchPuchaseOrder())
+      await dispatch(Custumer())
+      await dispatch(OrderFetch())
     }
     fetch();
   },[])

@@ -18,6 +18,7 @@ import AddnewProduct from "./Component/Product/AddnewProduct";
 import ImportProduct from "./Component/Product/ImportProduct";
 import Fixproduct from "./Component/Product/Fixproduct";
 import UpdateProduct from "./Component/Product/UpdateProduct";
+import Custumer from "./Component/Custumer/Custumer";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -30,15 +31,17 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               <Route path="Chart"  element={<Chart />} />
             </Route>
             <Route path="/Product" element={<Product />}>
-              <Route path="" index element={<ListProduct />} />
-              <Route path="Add"  element={<AddProduct />} >
+              {/* <Route path="" index element={<ListProduct />} /> */}
+              <Route path="Add" index  element={<AddProduct />} >
               </Route>
               <Route path="Add/:id" element={<Purchar />} />
               <Route path="Import"  element={<ImportProduct />} />
               <Route path="Add/fix/:id"  element={<UpdateProduct />} />
               <Route path="Import/:id"  element={<Fixproduct />} />
               <Route path="Addnewproduct" element={<AddnewProduct />} />
-              <Route path="Update" element={<AddProduct />} />
+              {/* <Route path="Update" element={<AddProduct />} /> */}
+            </Route>
+            <Route path="/custumer" element={<Custumer />}>
             </Route>
           </Route>
         </Routes>
