@@ -33,7 +33,7 @@ const data = [
   },
   {
     content: "Order",
-    link: "/",
+    link: "/order",
     icon: faCartFlatbed,
     flat:true,
     message:4

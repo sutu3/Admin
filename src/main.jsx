@@ -19,6 +19,8 @@ import ImportProduct from "./Component/Product/ImportProduct";
 import Fixproduct from "./Component/Product/Fixproduct";
 import UpdateProduct from "./Component/Product/UpdateProduct";
 import Custumer from "./Component/Custumer/Custumer";
+import Order from "./Component/Order/Order";
+import Item from "./Component/Order/Item";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -43,6 +45,11 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             </Route>
             <Route path="/custumer" element={<Custumer />}>
             </Route>
+            {/* <Route path="/order" element={<PregresUI />}>
+            </Route> */}
+            <Route path="/order" element={<Order />}>
+            </Route>
+                <Route path="order/Item/:id"  element={<Item />} />
           </Route>
         </Routes>
       </BrowserRouter>

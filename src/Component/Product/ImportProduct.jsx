@@ -20,7 +20,7 @@ const ImportProduct = () => {
   console.log(Order);
 
   return (
-    <div className='w-[1250px] h-full -translate-x-10 flex flex-row gap-3'>
+    <div className='w-[1250px] h-full -translate-x-10 flex flex-row gap-5'>
       <div className='w-[70%]'>
         <div className='w-full'>
           <Table bottomContent={
