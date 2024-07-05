@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -21,37 +21,49 @@ import {
   CardHeader,
   CardFooter,
   Progress,
+  CardBody,
+  Tooltip,
 } from "@nextui-org/react";
 import {VerticalDotsIcon} from "../Custumer/VerticalDotsIcon";
 import {ChevronDownIcon} from "../Custumer/ChevronIcon.jsx";
 import { capitalize } from "../Custumer/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAnglesRight, faBagShopping, faHouse, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Sale } from "../Redux/selector.jsx";
+import { faAnglesRight, faArrowDown, faArrowUp, faBagShopping, faHouse, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Sale,product } from "../Redux/selector.jsx";
 import { useSelector } from "react-redux";
 import { Link,useLocation } from "react-router-dom";
+import { Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, Rectangle, ResponsiveContainer, XAxis, YAxis } from "recharts";
 const statusColorMap = {
   active: "success",
   paused: "danger",
   vacation: "warning",
 };
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 const columns = [
   {name: "ID", uid: "id", sortable: true},
-  {name: "Title", uid: "title", sortable: true},
-  {name: "Percent", uid: "Percent", sortable: true},
+  {name: "NAME", uid: "name", sortable: true},
+  {name: "Type", uid: "type"},
   {name: "Quantity", uid: "quantity", sortable: true},
-  {name: "Date_start", uid: "Date_start"},
-  {name: "Date_end", uid: "Date_end"},
-  {name: "", uid: "next"},
-//   {name: "STATUS", uid: "status", sortable: true},
-//   {name: "ACTIONS", uid: "actions"},
+  {name: "Gender", uid: "gender"},
 ];
-// id:el.discount_id,
-//     title:el.title,
-//     Percent:el.percent,
-//     quantity:el.saleDiscount.reduce((acc,el)=>acc+el.quantity,0),
-//     Date_start:el.date_start,
-//     Date_end:el.date_end
+const columns1 = [
+  {name: "ID", uid: "id", sortable: true},
+  {name: "Price_Base", uid: "priceBase"},
+  {name: "Price_Sale", uid: "priceSale"},
+  {name: "Size", uid: "size"},
+  {name: "Color", uid: "color"},
+  {name: "Quantity", uid: "quantity"},
+  {name: "Total_Money", uid: "totalMoney"},
+  {name: "Profit", uid: "profit"},
+];
+ {/* id:el.productID,
+    priceBase:el.priceBase,
+    priceSale:el.priceSale,
+    color:el.color,
+    size:el.size,
+    quantity:el.quantity,
+    totalMoney:el.totalMoney,
+    profit:(el.priceSale-el.priceBase)*el.quantity, */}
 const statusOptions = [
   {name: "Active", uid: "active"},
   {name: "Paused", uid: "paused"},
@@ -60,34 +72,125 @@ const statusOptions = [
 
 
 
-const INITIAL_VISIBLE_COLUMNS = ["name","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["name","type","quantity","gender","id","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
 
+
+const CustomBar = (props) => {
+  const { fill, x, y, width, height } = props;
+  return (
+    <Rectangle
+      fill={fill} 
+      x={x} 
+      y={y} 
+      width={width} 
+      height={height} 
+      radius={[10, 10, 0, 0]} 
+    />
+  );
+};
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: 'rgba(0, 0, 0, 0)',
+        color: '#ffffff',
+        borderRadius: '5px',
+        padding: '5px',
+      }}>
+        <p style={{ margin: 0 }} className='bg-white text-slate-600 p-2 rounded-xl'>{`${label} : ${payload[0].value}`}</p>
+      </div>
+    );
+  }
+
+  return null;
+};
 const ProductSale=()=> {
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [key,setkey]=useState(-1)
   const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "age",
     direction: "ascending",
   });
   const sale=useSelector(Sale)
+  const Product=useSelector(product)
   const location =
     useLocation().pathname.split("/")[
       useLocation().pathname.split("/").length - 1
     ];
   const productSale=sale.find((el)=>el.discount_id==location)
-  console.log(productSale)
-  const users=sale.map((el)=>({
-    id:el.discount_id,
-    title:el.title,
-    Percent:el.percent*100+'%',
-    quantity:el.saleDiscount.reduce((acc,el)=>acc+el.quantity,0),
-    Date_start:el.date_start.split('T')[0],
-    Date_end:el.date_end.split('T')[0],
-    next:<Link to={`/promotion/${el.discount_id}`}><FontAwesomeIcon icon={faAnglesRight} /> </Link> 
+  const users=productSale.productShow.map((el)=>({
+    id:el.product_id,
+    name:el.name,
+    type:el.type,
+    quantity:sale.find((el1)=>el1.discount_id==location).saleDiscount.reduce((acc,el2)=>{
+  // If there's no entry in acc for the product_id yet, create a new entry
+  if (!acc[el2.productID]) {
+    acc[el2.productID] = 0;
+  }
+  // Add the quantity to the existing entry for the product_id
+  acc[el2.productID] += el2.quantity;
+  // Return the updated accumulator
+  return   acc;
+}, {})[el.product_id],
+    avatar:Product.find((el1)=>el1.product_id==el.product_id).imagesMap[0].image_urlString,
+    gender:el.gender
   }))
+  const user1=sale.find((el1)=>el1.discount_id==location).saleDiscount.map((el)=>el.productID==key?({
+    id:el.productID,
+    priceBase:el.priceBase,
+    priceSale:el.priceSale,
+    color:el.color,
+    size:el.size,
+    quantity:el.quantity,
+    totalMoney:el.totalMoney,
+    profit:((el.priceSale-el.priceSale*productSale.percent)-el.priceBase)*el.quantity,
+  }):null).filter((el)=>el!=null)
+  console.log(user1)
+  const data=productSale.productShow.map((el)=>({
+    name:el.name,
+    Sales:sale.find((el1)=>el1.discount_id==location).saleDiscount.reduce((acc,el2)=>{
+  // If there's no entry in acc for the product_id yet, create a new entry
+  if (!acc[el2.productID]) {
+    acc[el2.productID] = 0;
+  }
+  // Add the quantity to the existing entry for the product_id
+  acc[el2.productID] += el2.totalMoney;
+  // Return the updated accumulator
+  return   acc;
+}, {})[el.product_id]
+  }))
+  const data01=productSale.productShow.map((el)=>({
+    name:Product.find((el1)=>el1.product_id==el.product_id).name,
+    value:sale.find((el1)=>el1.discount_id==location).saleDiscount.reduce((acc,el2)=>{
+  // If there's no entry in acc for the product_id yet, create a new entry
+  if (!acc[el2.productID]) {
+    acc[el2.productID] = 0;
+  }
+  // Add the quantity to the existing entry for the product_id
+  acc[el2.productID] += el2.quantity;
+  // Return the updated accumulator
+  return   acc;
+}, {})[el.product_id]
+  }))
+  const data02=productSale.saleDiscount.map((el)=>({
+    name:Product.find((el1)=>el1.product_id==el.productID).name,
+    value:el.quantity
+  }))
+  console.log(sale.find((el1) => el1.discount_id == location).saleDiscount.reduce((acc, el2) => {
+  // If there's no entry in acc for the product_id yet, create a new entry
+  if (!acc[el2.productID]) {
+    acc[el2.productID] = 0;
+  }
+  // Add the quantity to the existing entry for the product_id
+  acc[el2.productID] += el2.quantity;
+  // Return the updated accumulator
+  return   acc;
+}, {}))
   const [page, setPage] = React.useState(1);
 
   const pages = Math.ceil(users.length / rowsPerPage);
@@ -140,7 +243,7 @@ const ProductSale=()=> {
     switch (columnKey) {
       case "name":
         return (
-          <User
+          <User  aria-labelledby="submit-label"
             avatarProps={{radius: "full", size: "sm", src: user.avatar}}
             classNames={{
               description: "text-default-500",
@@ -153,14 +256,14 @@ const ProductSale=()=> {
         );
       case "role":
         return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-500">{user.team}</p>
+          <div className="flex flex-col"  aria-labelledby="submit-label">
+            <p className="text-bold text-small capitalize"  aria-labelledby="submit-label">{cellValue}</p>
+            <p className="text-bold text-tiny capitalize text-default-500"  aria-labelledby="submit-label">{user.team}</p>
           </div>
         );
       case "status":
         return (
-          <Chip
+          <Chip  aria-labelledby="submit-label"
             className="capitalize border-none gap-1 text-default-600"
             color={statusColorMap[user.status]}
             size="sm"
@@ -171,17 +274,17 @@ const ProductSale=()=> {
         );
       case "actions":
         return (
-          <div className="relative flex justify-end items-center gap-2">
-            <Dropdown className="bg-background border-1 border-default-200">
-              <DropdownTrigger>
-                <Button isIconOnly radius="full" size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-400" />
+          <div className="relative flex justify-end items-center gap-2"  aria-labelledby="submit-label">
+            <Dropdown className="bg-background border-1 border-default-200"  aria-labelledby="submit-label">
+              <DropdownTrigger  aria-labelledby="submit-label">
+                <Button isIconOnly radius="full" size="sm" variant="light"  aria-labelledby="submit-label">
+                  <VerticalDotsIcon className="text-default-400"  aria-labelledby="submit-label"/>
                 </Button>
               </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+              <DropdownMenu  aria-labelledby="submit-label">
+                <DropdownItem  aria-labelledby="submit-label">View</DropdownItem>
+                <DropdownItem  aria-labelledby="submit-label">Edit</DropdownItem>
+                <DropdownItem  aria-labelledby="submit-label">Delete</DropdownItem>
               </DropdownMenu>
             </Dropdown>
           </div>
@@ -210,7 +313,7 @@ const ProductSale=()=> {
     return (
       <div className="flex flex-col gap-4 ">
         <div className="flex justify-between gap-3 items-end">
-          <Input
+          <Input  aria-labelledby="submit-label"
             isClearable
             classNames={{
               base: "w-full ",
@@ -225,11 +328,11 @@ const ProductSale=()=> {
             onValueChange={onSearchChange}
           />
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {users.length} users</span>
-          <label className="flex items-center text-default-400 text-small">
+        <div className="flex justify-between items-center"  aria-labelledby="submit-label">
+          <span className="text-default-400 text-small"  aria-labelledby="submit-label">Total {users.length} users</span>
+          <label className="flex items-center text-default-400 text-small"  aria-labelledby="submit-label">
             Rows per page:
-            <select
+            <select  aria-labelledby="submit-label"
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
             >
@@ -293,8 +396,8 @@ const ProductSale=()=> {
   );
 
   return (
-    <div>
-<div className="w-[1350px] h-full  m-auto flex flex-col mt-4">
+    <div className="w-[1350px] h-full translate-x-10 p-5">
+<div className="w-full h-full  m-auto flex flex-col mt-4 gap-5">
       <Breadcrumbs  aria-labelledby="submit-label"
         isDisabled
         radius="lg"
@@ -305,20 +408,69 @@ const ProductSale=()=> {
           <FontAwesomeIcon icon={faHouse} style={{ color: "#c5c6c9" }} />
         </BreadcrumbItem>
         <BreadcrumbItem>All Promotion</BreadcrumbItem>
-
+        <BreadcrumbItem>Promition No:{productSale.discount_id}</BreadcrumbItem>
       </Breadcrumbs>
-      <div className="w-full flex flex-col items-start">
-        <div className="text-3xl font-bold">Promotion</div>
-        <div className="font-bold font-serif mt-3">At a glance</div>
-        
+      <div className="w-full p-3 text-2xl font-mono text-left">TiTle: {productSale.title}</div>
+      <div className="w-full flex flex-row items-start justify-between">
+      <div className="w-1/2">
+        <Card style={{  background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className={`w-[700px] h-[300px]`}>
+      <CardHeader>
+        <div style={{ color: '#ffffff', fontWeight: 'bold' }}>Biểu Đồ Thống Kê</div>
+      </CardHeader>
+      <CardBody>
+        <ResponsiveContainer className={"text-[12px]"}>
+          <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#555555" />
+            <XAxis dataKey="name" stroke="#ffffff" />
+            <YAxis stroke="#ffffff" />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(0, 0, 0, 0)' }} />
+            <Legend />
+            <Bar dataKey="Sales" fill="#ffffff" shape={<CustomBar />} barSize={10} />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardBody>
+    </Card>
       </div>
-      <div>
-        <Table
+        <div className="w-1/2 flex justify-end">
+          {/* <ResponsiveContainer width="100%" height="100%"> */}
+         <PieChart width={500} height={300}>
+    <Pie 
+      data={data01} 
+      dataKey="value" 
+      cx="50%" 
+      cy="50%" 
+      outerRadius={80} 
+      fill="#8884d8"
+      className="w-[600px] h-[400px]" 
+    />
+    <Pie 
+      data={data02} 
+      dataKey="value" 
+      cx="50%" 
+      cy="50%" 
+      innerRadius={90} 
+      outerRadius={110} 
+      fill="#82ca9d" 
+      label 
+    >
+      {data02.map((entry, index) => (
+        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+      ))}
+    </Pie>
+    <Tooltip />
+  </PieChart>
+      {/* </ResponsiveContainer> */}
+        </div>
+      </div>
+      <div className=" w-full h-full flex flex-col">
+      <div className="w-[100%] h-full">
+      <Table
           aria-label="Example table with custom cells, pagination and sorting"
           isHeaderSticky
-          selectionBehavior="replace"
+          onRowAction={(key) => setkey(key)}
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
+          
           classNames={{
     table: "border-[2px] border-slate-300 rounded-lg",
     thead: "bg-slate-200 rounded-t-lg",
@@ -356,6 +508,83 @@ const ProductSale=()=> {
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="w-[100%] h-full">
+      <Table
+          aria-label="Example table with custom cells, pagination and sorting"
+          isHeaderSticky
+                    selectionBehavior="replace"
+
+          //onRowAction={(key) => setkey(key)}
+          //bottomContent={bottomContent}
+          bottomContentPlacement="outside"
+          
+          classNames={{
+    table: "border-[2px] border-slate-300 rounded-lg",
+    thead: "bg-slate-200 rounded-t-lg",
+    tbody: "rounded-b-lg",
+    td: "border-b-[2px] border-slate-200 p-3"
+  }}
+          selectedKeys={selectedKeys}
+          selectionMode="multiple"
+          sortDescriptor={sortDescriptor}
+          topContentPlacement="outside"
+          onSelectionChange={setSelectedKeys}
+          onSortChange={setSortDescriptor}
+        >
+          <TableHeader columns={headerColumns}>
+          {columns1.map((el)=>
+          <TableColumn
+                key={el.uid}
+                align={el.uid === "actions" ? "center" : "start"}
+                allowsSorting={el.sortable}
+              >
+                {el.name}
+              </TableColumn>)}
+            {/* {(column1) => (
+              <TableColumn
+                key={column.uid}
+                align={column.uid === "actions" ? "center" : "start"}
+                allowsSorting={column.sortable}
+              >
+                {column.name}
+              </TableColumn>
+            )} */}
+          </TableHeader>
+          <TableBody emptyContent={"No users found"} items={sortedItems}>
+          {user1.map((el,index)=><TableRow key={index}>
+                  <TableCell>
+                    {el.id}
+                  </TableCell>
+                  <TableCell>
+                    {el.priceBase}
+                  </TableCell>
+                  <TableCell>
+                    {el.priceSale}
+                  </TableCell>
+                  <TableCell>
+                    {el.size}
+                  </TableCell>
+                  <TableCell>
+                    <div style={{backgroundColor:el.color}} className="w-10 h-5 rounded-lg"></div>
+                  </TableCell>
+                  <TableCell>
+                    {el.quantity}
+                  </TableCell>
+                  <TableCell>
+                    {el.totalMoney}
+                  </TableCell>
+                  <TableCell>
+                  <div className={`${el.profit<0?'text-[#f37474]':'text-[#59fbd6]'} flex flex-row gap-4`}>
+                    {el.profit>0?<FontAwesomeIcon icon={faArrowUp} rotation={45} style={{color: "#63E6BE",}} />:<FontAwesomeIcon icon={faArrowDown} rotation={45} style={{color: "#f63b5e",}} />}
+                    {el.profit}
+                  </div>
+                  </TableCell>
+              </TableRow>)}
+           
+          </TableBody>
+        </Table>
+      </div>  
       </div>
     </div>
     </div>
