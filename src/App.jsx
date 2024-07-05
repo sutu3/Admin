@@ -9,6 +9,7 @@ import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
 import { Custumer } from './Component/Redux/CustummerSlice.jsx'
 import { OrderFetch } from './Component/Redux/OrderSlice.jsx'
+import { SaleFetch } from './Component/Redux/SalesSlice.jsx'
 const App=()=> {
   const dispatch = useDispatch();
   useEffect(()=>{
@@ -16,6 +17,7 @@ const App=()=> {
       await dispatch(FetchPuchaseOrder())
       await dispatch(Custumer())
       await dispatch(OrderFetch())
+      await dispatch(SaleFetch())
     }
     fetch();
   },[])

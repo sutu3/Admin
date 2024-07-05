@@ -535,7 +535,7 @@ export const UpdateQuality = (payload) => {
           quantity: payload.quantity,
           purchaseOrder: payload.purchaseOrder,
           variant: payload.variant,
-          quantity_real:0,
+          quantity_real: 0,
           productVersion: payload.productVersion,
           // purchase_price: payload.purchase_price,
           // quantity: payload.quantity,
@@ -930,12 +930,44 @@ export const UpdateQuantityAndPrice = createAsyncThunk(
     }
   }
 );
+export const CreateInventory = createAsyncThunk(
+  "purchase/CreateInventory",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/inventory/creatInventory`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 //Thằng này dùng để lên giá sản phẩm và số lượng thực tế nhận được chuyển trạng thái sang received
 export const ImportPurchase = (payload) => {
   return async function Check(dispatch, getState) {
     try {
       const today = new Date();
-
       const year = today.getFullYear();
       const month = String(today.getMonth() + 1).padStart(2, "0"); // Đảm bảo tháng luôn có 2 chữ số
       const day = String(today.getDate()).padStart(2, "0");
@@ -965,12 +997,20 @@ export const ImportPurchase = (payload) => {
               (el1) => el1.color == el1.color && el1.sizeEnum == el.sizeEnum
             ).catetorySize,
             productversion: el.productVersion,
-            quantity_in_stock: el.quantity_real,
+            quantity_in_stock: parseInt(el.quantity_real),
+          })
+        );
+        await dispatch(
+          CreateInventory({
+            change_amount: parseInt(el.quantity_real),
+            event_type: "Nhập_hàng",
+            order_id: 0,
+            inventoryVariant: el.variant,
           })
         );
         await dispatch(
           UpdateQuantityOrdetItemPurchase({
-           purchase_order_items_id: el.purchase_order_items_id,
+            purchase_order_items_id: el.purchase_order_items_id,
             quantity_real: el.quantity_real,
           })
         );

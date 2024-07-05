@@ -46,7 +46,7 @@ const data = [
   },
   {
     content: "Promotion",
-    link: "/",
+    link: "/promotion",
     icon:faTag,
     flat:false
   },

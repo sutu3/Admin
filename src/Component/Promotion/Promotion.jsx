@@ -1,144 +1,124 @@
+import React from "react";
 import {
-  faBagShopping,
-  faChevronDown,
-  faHouse,
-  faMagnifyingGlass,
-  faPlus,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  BreadcrumbItem,
-  Breadcrumbs,
-  Button,
-  Card,
-  CardFooter,
-  CardHeader,
-  Chip,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  Pagination,
-  Progress,
   Table,
-  TableBody,
-  TableCell,
-  TableColumn,
   TableHeader,
+  TableColumn,
+  TableBody,
   TableRow,
+  TableCell,
+  Input,
+  Button,
+  DropdownTrigger,
+  Dropdown,
+  DropdownMenu,
+  DropdownItem,
+  Chip,
   User,
+  Pagination,
+  Breadcrumbs,
+  BreadcrumbItem,
+  Card,
+  CardHeader,
+  CardFooter,
+  Progress,
 } from "@nextui-org/react";
-import React, { useCallback, useMemo, useState } from "react";
-import { useSelector } from "react-redux";
-import { Orders, custumer } from "../Redux/selector";
-import { VerticalDotsIcon } from "../Custumer/VerticalDotsIcon";
+import {VerticalDotsIcon} from "../Custumer/VerticalDotsIcon";
+import {ChevronDownIcon} from "../Custumer/ChevronIcon.jsx";
 import { capitalize } from "../Custumer/Utils";
-import { ChevronDownIcon } from "../Custumer/ChevronIcon";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAnglesRight, faBagShopping, faHouse, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { Sale } from "../Redux/selector.jsx";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 const statusColorMap = {
-  Prepare: "#f5f7ff",
-  Pending: "#f7910b",
-  Shipping: "#1db6d8",
-  Completed: "#0b9351",
-  Cancel: "#f04438",
+  active: "success",
+  paused: "danger",
+  vacation: "warning",
 };
 const columns = [
-  { name: "ID", uid: "id", sortable: true },
-  { name: "NAME", uid: "name", sortable: true },
-  { name: "Create_At", uid: "CreateDate" },
-  { name: "Shipping_At", uid: "shipping_at" },
-  { name: "Address", uid: "shipping_to" },
-  { name: "Lines", uid: "Lines" },
-  { name: "Total_Amount", uid: "total_amount" },
-  { name: "EMAIL", uid: "email" },
-  { name: "STATUS", uid: "status", sortable: true },
+  {name: "ID", uid: "id", sortable: true},
+  {name: "Title", uid: "title", sortable: true},
+  {name: "Percent", uid: "Percent", sortable: true},
+  {name: "Quantity", uid: "quantity", sortable: true},
+  {name: "Date_start", uid: "Date_start"},
+  {name: "Date_end", uid: "Date_end"},
+  {name: "", uid: "next"},
+//   {name: "STATUS", uid: "status", sortable: true},
+//   {name: "ACTIONS", uid: "actions"},
 ];
+// id:el.discount_id,
+//     title:el.title,
+//     Percent:el.percent,
+//     quantity:el.saleDiscount.reduce((acc,el)=>acc+el.quantity,0),
+//     Date_start:el.date_start,
+//     Date_end:el.date_end
 const statusOptions = [
-  { name: "Prepare", uid: "Prepare" },
-  { name: "Pending", uid: "Pending" },
-  { name: "Shipping", uid: "Shipping" },
-  { name: "Completed", uid: "Completed" },
-  { name: "Cancel", uid: "Cancel" },
+  {name: "Active", uid: "active"},
+  {name: "Paused", uid: "paused"},
+  {name: "Vacation", uid: "vacation"},
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["name","shipping_to","Lines","total_amount","email","id","CreateDate","shipping_at", "Dropdownole", "status", "actions"];
-const Order = () => {
-  const orders = useSelector(Orders);
-  const Customers = useSelector(custumer);
-  const users = orders.map((el) => {
-    const data = Customers.find((el1) => el1.account_id == el.account);
-    if (data) {
-      return {
-        id: el.orders_id,
-        name: data.username,
-        email: data.email,
-        CreateDate: el.created_at ? el.created_at.split("T")[0] : "--",
-        shipping_at: el.shipping_at ? el.shipping_at.split("T")[0] : "--",
-        shipping_to: el.addressorder ? el.addressorder : "--" ,
-        Lines: el.orderItems.length,
-        total_amount: el.total_amount,
-        status: el.status,
-        avatar: data.avatarString
-          ? data.avatarString
-          : "https://www.freeiconspng.com/thumbs/account-icon/account-icon-8.png",
-      };
-    }
-  });
-  console.log(orders);
-  const [filterValue, setFilterValue] = useState("");
-  const [selectedKeys, setSelectedKeys] = useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = useState(
-    new Set(INITIAL_VISIBLE_COLUMNS)
-  );
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [sortDescriptor, setSortDescriptor] = useState({
+
+
+const INITIAL_VISIBLE_COLUMNS = ["name","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
+
+const Promotion=()=> {
+  const [filterValue, setFilterValue] = React.useState("");
+  const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
+  const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  const [statusFilter, setStatusFilter] = React.useState("all");
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [sortDescriptor, setSortDescriptor] = React.useState({
     column: "age",
     direction: "ascending",
   });
-  const [page, setPage] = useState(1);
+  const sale=useSelector(Sale)
+  const users=sale.map((el)=>({
+    id:el.discount_id,
+    title:el.title,
+    Percent:el.percent*100+'%',
+    quantity:el.saleDiscount.reduce((acc,el)=>acc+el.quantity,0),
+    Date_start:el.date_start.split('T')[0],
+    Date_end:el.date_end.split('T')[0],
+    next:<Link to={`/promotion/${el.discount_id}`}><FontAwesomeIcon icon={faAnglesRight} /> </Link> 
+  }))
+  const [page, setPage] = React.useState(1);
+
+  const pages = Math.ceil(users.length / rowsPerPage);
 
   const hasSearchFilter = Boolean(filterValue);
 
-  const headerColumns = useMemo(() => {
+  const headerColumns = React.useMemo(() => {
     if (visibleColumns === "all") return columns;
 
-    return columns.filter((column) =>
-      Array.from(visibleColumns).includes(column.uid)
-    );
+    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid));
   }, [visibleColumns]);
 
-  const filteredItems = useMemo(() => {
+  const filteredItems = React.useMemo(() => {
     let filteredUsers = [...users];
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.name.toLowerCase().includes(filterValue.toLowerCase())
+        user.title.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
-    if (
-      statusFilter !== "all" &&
-      Array.from(statusFilter).length !== statusOptions.length
-    ) {
+    if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status)
+        Array.from(statusFilter).includes(user.title),
       );
     }
 
     return filteredUsers;
   }, [users, filterValue, statusFilter]);
 
-  const pages = Math.ceil(filteredItems.length / rowsPerPage);
-
-  const items = useMemo(() => {
+  const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
   }, [page, filteredItems, rowsPerPage]);
 
-  const sortedItems = useMemo(() => {
+  const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
@@ -148,14 +128,17 @@ const Order = () => {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = useCallback((user, columnKey) => {
+  const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
     switch (columnKey) {
       case "name":
         return (
-          <User  aria-labelledby="submit-label"
-            avatarProps={{ radius: "lg", src: user.avatar }}
+          <User
+            avatarProps={{radius: "full", size: "sm", src: user.avatar}}
+            classNames={{
+              description: "text-default-500",
+            }}
             description={user.email}
             name={cellValue}
           >
@@ -166,36 +149,27 @@ const Order = () => {
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">
-              {user.team}
-            </p>
+            <p className="text-bold text-tiny capitalize text-default-500">{user.team}</p>
           </div>
         );
       case "status":
         return (
-            <Link to={`Item/${user.id}`} className="text-slate-300">
           <Chip
-            className="capitalize"
+            className="capitalize border-none gap-1 text-default-600"
             color={statusColorMap[user.status]}
             size="sm"
-            variant="flat"
+            variant="dot"
           >
-            <div
-              style={{ backgroundColor: statusColorMap[user.status] }}
-              className="rounded-lg p-1"
-            >
-              {cellValue}
-            </div>
+            {cellValue}
           </Chip>
-              </Link>
         );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
-            <Dropdown  aria-labelledby="submit-label" backdrop="blur">
-              <DropdownTrigger  aria-labelledby="submit-label" >
-                <Button isIconOnly size="sm" variant="light">
-                  <VerticalDotsIcon className="text-default-300" />
+            <Dropdown className="bg-background border-1 border-default-200">
+              <DropdownTrigger>
+                <Button isIconOnly radius="full" size="sm" variant="light">
+                  <VerticalDotsIcon className="text-default-400" />
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
@@ -211,24 +185,13 @@ const Order = () => {
     }
   }, []);
 
-  const onNextPage = useCallback(() => {
-    if (page < pages) {
-      setPage(page + 1);
-    }
-  }, [page, pages]);
-
-  const onPreviousPage = useCallback(() => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  }, [page]);
-
-  const onRowsPerPageChange = useCallback((e) => {
+  const onRowsPerPageChange = React.useCallback((e) => {
     setRowsPerPage(Number(e.target.value));
     setPage(1);
   }, []);
 
-  const onSearchChange = useCallback((value) => {
+
+  const onSearchChange = React.useCallback((value) => {
     if (value) {
       setFilterValue(value);
       setPage(1);
@@ -237,84 +200,36 @@ const Order = () => {
     }
   }, []);
 
-  const onClear = useCallback(() => {
-    setFilterValue("");
-    setPage(1);
-  }, []);
-
-  const topContent = useMemo(() => {
+  const topContent = React.useMemo(() => {
     return (
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 ">
         <div className="flex justify-between gap-3 items-end">
-          <Input  aria-labelledby="submit-label"
+          <Input
             isClearable
-            className="w-full sm:max-w-[44%] border-2 border-slate-400 rounded-xl"
+            classNames={{
+              base: "w-full ",
+              inputWrapper: "border-1",
+            }}
             placeholder="Search by name..."
-            startContent={
-              <FontAwesomeIcon
-                icon={faMagnifyingGlass}
-                style={{ color: "#d3e1f8" }}
-              />
-            }
+            size="sm"
+            startContent={<FontAwesomeIcon icon={faMagnifyingGlass} />}
             value={filterValue}
-            onClear={() => onClear()}
+            variant="bordered"
+            onClear={() => setFilterValue("")}
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Dropdown backdrop="blur"  aria-labelledby="submit-label">
-              <DropdownTrigger  aria-labelledby="submit-label" className="hidden sm:flex">
-                <Button
-                  endContent={<FontAwesomeIcon icon={faChevronDown} />}
-                  variant="flat"
-                >
-                  Status
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={statusFilter}
-                selectionMode="multiple"
-                onSelectionChange={setStatusFilter}
-              >
-                {statusOptions.map((status) => (
-                  <DropdownItem key={status.uid} className="capitalize">
-                    {capitalize(status.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
-            <Dropdown backdrop="blur"  aria-labelledby="submit-label">
-              <DropdownTrigger  aria-labelledby="submit-label" className="hidden sm:flex">
-                <Button
-                  endContent={<ChevronDownIcon className="text-small" />}
-                  variant="flat"
-                >
-                  Columns
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu
-                disallowEmptySelection
-                aria-label="Table Columns"
-                closeOnSelect={false}
-                selectedKeys={visibleColumns}
-                selectionMode="multiple"
-                onSelectionChange={setVisibleColumns}
-              >
-                {columns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize font-bold">
-                    {capitalize(column.name)}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown>
+            <Button
+              className="bg-foreground text-background"
+              endContent={<FontAwesomeIcon icon={faPlus} />}
+              size="sm"
+            >
+              Add New
+            </Button>
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">
-            Total {users.length} users
-          </span>
+          <span className="text-default-400 text-small">Total {users.length} users</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -333,20 +248,15 @@ const Order = () => {
     filterValue,
     statusFilter,
     visibleColumns,
+    onSearchChange,
     onRowsPerPageChange,
     users.length,
-    onSearchChange,
     hasSearchFilter,
   ]);
 
-  const bottomContent = useMemo(() => {
+  const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex justify-between items-center">
-        <span className="w-[30%] text-small text-default-400">
-          {selectedKeys === "all"
-            ? "All items selected"
-            : `${selectedKeys.size} of ${filteredItems.length} selected`}
-        </span>
         <Pagination  aria-labelledby="submit-label"
           isCompact
           showControls
@@ -357,29 +267,37 @@ const Order = () => {
           total={pages}
           onChange={setPage}
         />
-        <div className="hidden sm:flex w-[30%] justify-end gap-2">
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onPreviousPage}
-          >
-            Previous
-          </Button>
-          <Button
-            isDisabled={pages === 1}
-            size="sm"
-            variant="flat"
-            onPress={onNextPage}
-          >
-            Next
-          </Button>
-        </div>
+        <span className="text-small text-default-400">
+          {selectedKeys === "all"
+            ? "All items selected"
+            : `${selectedKeys.size} of ${items.length} selected`}
+        </span>
       </div>
     );
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+
+  const classNames = React.useMemo(
+    () => ({
+      wrapper: ["max-h-[382px]", "max-w-3xl"],
+      th: ["bg-transparent", "text-default-500", "border-b", "border-divider"],
+      td: [
+        // changing the rows border radius
+        // first
+        "group-data-[first=true]:first:before:rounded-none",
+        "group-data-[first=true]:last:before:rounded-none",
+        // middle
+        "group-data-[middle=true]:before:rounded-none",
+        // last
+        "group-data-[last=true]:first:before:rounded-none",
+        "group-data-[last=true]:last:before:rounded-none",
+      ],
+    }),
+    [],
+  );
+
   return (
-    <div className="w-[1350px] h-full  m-auto flex flex-col mt-4">
+    <div>
+<div className="w-[1350px] h-full  m-auto flex flex-col mt-4">
       <Breadcrumbs  aria-labelledby="submit-label"
         isDisabled
         radius="lg"
@@ -389,10 +307,10 @@ const Order = () => {
         <BreadcrumbItem>
           <FontAwesomeIcon icon={faHouse} style={{ color: "#c5c6c9" }} />
         </BreadcrumbItem>
-        <BreadcrumbItem>All Order</BreadcrumbItem>
+        <BreadcrumbItem>All Promotion</BreadcrumbItem>
       </Breadcrumbs>
       <div className="w-full flex flex-col items-start">
-        <div className="text-3xl font-bold">Sales orders</div>
+        <div className="text-3xl font-bold">Promotion</div>
         <div className="font-bold font-serif mt-3">At a glance</div>
         <div className="flex flex-row w-full gap-2 justify-center mt-5 mb-10">
           <Card  aria-labelledby="submit-label"
@@ -575,7 +493,9 @@ const Order = () => {
         </Table>
       </div>
     </div>
+    </div>
+    
   );
-};
+}
+export default Promotion;
 
-export default Order;

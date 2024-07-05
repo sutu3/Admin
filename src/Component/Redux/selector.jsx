@@ -7,3 +7,4 @@ export const Size=(state)=>state.product.size;
 export const custumer=(state)=>state.custumer.custumer;
 export const roles=(state)=>state.custumer.Roles;
 export const Orders=(state)=>state.order.order;
+export const Sale=(state)=>state.sale.sale;
