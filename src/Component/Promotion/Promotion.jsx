@@ -23,13 +23,11 @@ import {
   Progress,
 } from "@nextui-org/react";
 import {VerticalDotsIcon} from "../Custumer/VerticalDotsIcon";
-import {ChevronDownIcon} from "../Custumer/ChevronIcon.jsx";
-import { capitalize } from "../Custumer/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAnglesRight, faBagShopping, faHouse, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { Sale } from "../Redux/selector.jsx";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 const statusColorMap = {
   active: "success",
   paused: "danger",
@@ -72,6 +70,7 @@ const Promotion=()=> {
     column: "age",
     direction: "ascending",
   });
+  const navigate = useNavigate();
   const sale=useSelector(Sale)
   const users=sale.map((el)=>({
     id:el.discount_id,
@@ -223,6 +222,7 @@ const Promotion=()=> {
               className="bg-foreground text-background"
               endContent={<FontAwesomeIcon icon={faPlus} />}
               size="sm"
+              onClick={()=>navigate('/promotion/addnew')}
             >
               Add New
             </Button>

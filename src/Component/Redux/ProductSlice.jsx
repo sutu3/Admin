@@ -11,6 +11,7 @@ const ProductSlice = createSlice({
     size: [],
     type: [],
     gender: [],
+    quantity:[]
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -84,6 +85,9 @@ const ProductSlice = createSlice({
       })
       .addCase(TypeOfGenderFecth.fulfilled, (state, action) => {
         state.gender = action.payload;
+      })
+      .addCase(QuantityOfProductFecth.fulfilled, (state, action) => {
+        state.quantity=action.payload
       });
   },
 });
@@ -94,12 +98,25 @@ export const FetchInfom = () => {
     await dispatch(SizeFecth());
     await dispatch(TypeOfProductFecth());
     await dispatch(TypeOfGenderFecth());
+    await dispatch(QuantityOfProductFecth());
   };
 };
 export const TypeOfProductFecth = createAsyncThunk(
   "product/TypeOfProductFecth",
   async () => {
     const res = await fetch(`${url1}/product/typeOnly`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    return data;
+  }
+);
+export const QuantityOfProductFecth = createAsyncThunk(
+  "product/QuantityOfProductFecth",
+  async () => {
+    const res = await fetch(`${url1}/statistic/stock`, {
       headers: {
         "Content-Type": "application/json",
       },

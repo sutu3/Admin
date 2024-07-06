@@ -1,3 +1,4 @@
+// index.js hoặc App.js
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { NextUIProvider } from "@nextui-org/react";
@@ -23,6 +24,7 @@ import Order from "./Component/Order/Order";
 import Item from "./Component/Order/Item";
 import Promotion from "./Component/Promotion/Promotion";
 import ProductSale from "./Component/Promotion/ProductSale";
+import AddnewPromotion from "./Component/Promotion/AddnewPromotion";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -55,6 +57,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
                 <Route path="order/Item/:id"  element={<Item />} />
                 <Route path="/promotion"  element={<Promotion />} />
                 <Route path="/promotion/:id"  element={<ProductSale />} />
+                <Route path="/promotion/addnew"  element={<AddnewPromotion />} />
           </Route>
         </Routes>
       </BrowserRouter>

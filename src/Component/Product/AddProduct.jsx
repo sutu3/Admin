@@ -3,7 +3,7 @@ import {Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDis
 import TableProduct from "./tableProduct.jsx";
 import Select from "../SelectInput/indext";
 import { useSelector,useDispatch } from "react-redux";
-import { product,PurchaseOrder } from "../Redux/selector.jsx";
+import { product,PurchaseOrder,Quantity } from "../Redux/selector.jsx";
 import InputFind from "./Input.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDeleteLeft, faReplyAll, faTruck } from "@fortawesome/free-solid-svg-icons";
@@ -32,6 +32,7 @@ const columns1 = [
 ];
 const AddProduct = () => {
   const dispatch=useDispatch();
+  const quantity=useSelector(Quantity)
   const OrderPurchase=useSelector(PurchaseOrder)
   console.log(OrderPurchase)
     const { isOpen, onOpen, onClose } = useDisclosure();
@@ -116,9 +117,12 @@ const AddProduct = () => {
                 avatar: el.imagesMap.length!=0
                   ? el.imagesMap[0].image_urlString
                   : "",
-                quantity: el.productVersion[0]
-                  ? el.productVersion[0].variants.reduce((acc, variant) => acc + variant.quantity_in_stock, 0)
-                  : 0,
+                quantity: quantity[el.product_id]
+      ? Object.entries(quantity[el.product_id]).reduce(
+          (acc, el) => acc + el[1],
+          0
+        )
+      : 0,
               }))}
               number={currentPage}
             />
