@@ -1,16 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardBody, CardHeader } from '@nextui-org/react';
 import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
-const data = [
-  { name: 'Jan', Sales: 400, pv: 240, amt: 240 },
-  { name: 'Feb', Sales: 300, pv: 139, amt: 221 },
-  { name: 'Mar', Sales: 200, pv: 980, amt: 229 },
-  { name: 'Apr', Sales: 278, pv: 390, amt: 200 },
-  { name: 'May', Sales: 189, pv: 480, amt: 218 },
-  { name: 'Jun', Sales: 239, pv: 380, amt: 250 },
-  { name: 'Jul', Sales: 349, pv: 430, amt: 210 },
-];
+import { useSelector } from 'react-redux';
+import { Statistical } from "../Redux/selector.jsx";
 
 const CustomBar = (props) => {
   const { fill, x, y, width, height } = props;
@@ -44,14 +36,62 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const Example = () => {
+  const [statistical, setStatistical] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const data = useSelector(Statistical);
+
+  useEffect(() => {
+    const fetchStatistical = async () => {
+      try {
+        // Giả sử data là kết quả từ API
+        const today = new Date().toISOString().split('T')[0];
+        const rawData = data[today] || {};
+
+        // Chuẩn bị dữ liệu cho biểu đồ
+        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const salesData = daysOfWeek.map(day => ({
+          name: day,
+          Sales: Object.entries(data).flatMap((el)=>
+         Object.entries(el[1]).flatMap((el2)=>el2[1].flatMap((el3)=>({
+          date:el[0],
+            name: el2[0],
+            money: el3.money,
+            quantity: el3.quantity,
+            sizeColor: el3.sizeColor,
+         }))))
+            .filter(item => new Date(item.date).getDay() === daysOfWeek.indexOf(day))
+            .reduce((acc, item) => acc + item.money, 0)
+        }));
+
+        setStatistical(salesData);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStatistical();
+  }, [data]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
-    <Card style={{  background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className={`w-[700px] h-[300px]`}>
+    <Card style={{ background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className="w-[580px] h-[300px] translate-x-3">
       <CardHeader>
         <div style={{ color: '#ffffff', fontWeight: 'bold' }}>Biểu Đồ Thống Kê</div>
       </CardHeader>
       <CardBody>
         <ResponsiveContainer>
-          <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+          <BarChart data={statistical} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#555555" />
             <XAxis dataKey="name" stroke="#ffffff" />
             <YAxis stroke="#ffffff" />

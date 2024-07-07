@@ -11,7 +11,8 @@ const ProductSlice = createSlice({
     size: [],
     type: [],
     gender: [],
-    quantity:[]
+    quantity:[],
+    inventory:[]
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -74,9 +75,9 @@ const ProductSlice = createSlice({
       .addCase(GetProduct.fulfilled, (state, action) => {
          state.product = state.product.map((el)=>el.product_id==action.payload.product_id?action.payload:el);
       })
-      .addCase(ColorFecth.fulfilled, (state, action) => {
-        state.color = action.payload;
-      })
+      // .addCase(ColorFecth.fulfilled, (state, action) => {
+      //   state.color = action.payload;
+      // })
       .addCase(SizeFecth.fulfilled, (state, action) => {
         state.size = action.payload;
       })
@@ -88,19 +89,35 @@ const ProductSlice = createSlice({
       })
       .addCase(QuantityOfProductFecth.fulfilled, (state, action) => {
         state.quantity=action.payload
-      });
+      })
+      .addCase(Inventory.fulfilled, (state, action) => {
+        state.inventory=action.payload
+      })
   },
 });
 export const FetchInfom = () => {
   return async function check(dispatch, getState) {
     await dispatch(ProductFecth());
-    await dispatch(ColorFecth());
+    //await dispatch(ColorFecth());
     await dispatch(SizeFecth());
     await dispatch(TypeOfProductFecth());
     await dispatch(TypeOfGenderFecth());
     await dispatch(QuantityOfProductFecth());
+    await dispatch(Inventory())
   };
 };
+export const Inventory = createAsyncThunk(
+  "product/Inventory",
+  async () => {
+    const res = await fetch(`${url1}/statistic/inventory`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+    return data;
+  }
+);
 export const TypeOfProductFecth = createAsyncThunk(
   "product/TypeOfProductFecth",
   async () => {
@@ -137,15 +154,15 @@ export const TypeOfGenderFecth = createAsyncThunk(
     return data;
   }
 );
-export const ColorFecth = createAsyncThunk("product/ColorFecth", async () => {
-  const res = await fetch(`${url1}/product/colorOnly`, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const data = await res.json();
-  return data;
-});
+// export const ColorFecth = createAsyncThunk("product/ColorFecth", async () => {
+//   const res = await fetch(`${url1}/product/colorOnly`, {
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   const data = await res.json();
+//   return data;
+// });
 export const SizeFecth = createAsyncThunk("product/SizeFecth", async () => {
   const res = await fetch(`${url1}/product/sizeOnly`, {
     headers: {

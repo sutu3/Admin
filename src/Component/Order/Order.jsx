@@ -62,10 +62,23 @@ const statusOptions = [
   { name: "Cancel", uid: "Cancel" },
 ];
 
-const INITIAL_VISIBLE_COLUMNS = ["name","shipping_to","Lines","total_amount","email","id","CreateDate","shipping_at", "Dropdownole", "status", "actions"];
+const INITIAL_VISIBLE_COLUMNS = [
+  "name",
+  "shipping_to",
+  "Lines",
+  "total_amount",
+  "email",
+  "id",
+  "CreateDate",
+  "shipping_at",
+  "Dropdownole",
+  "status",
+  "actions",
+];
 const Order = () => {
-  const orders = useSelector(Orders);
+  const orders = useSelector(Orders).filter((el)=>el.status!='Prepare');
   const Customers = useSelector(custumer);
+  // orders.filter((el)=>el.status=='Completed').map((el)=>(new Date(el.created_at)).toISOString().split('T')[0]==(new Date().toISOString().split('T')[0]))
   const users = orders.map((el) => {
     const data = Customers.find((el1) => el1.account_id == el.account);
     if (data) {
@@ -75,7 +88,7 @@ const Order = () => {
         email: data.email,
         CreateDate: el.created_at ? el.created_at.split("T")[0] : "--",
         shipping_at: el.shipping_at ? el.shipping_at.split("T")[0] : "--",
-        shipping_to: el.addressorder ? el.addressorder : "--" ,
+        shipping_to: el.addressorder ? el.addressorder : "--",
         Lines: el.orderItems.length,
         total_amount: el.total_amount,
         status: el.status,
@@ -85,7 +98,7 @@ const Order = () => {
       };
     }
   });
-  console.log(orders);
+
   const [filterValue, setFilterValue] = useState("");
   const [selectedKeys, setSelectedKeys] = useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = useState(
@@ -154,7 +167,8 @@ const Order = () => {
     switch (columnKey) {
       case "name":
         return (
-          <User  aria-labelledby="submit-label"
+          <User
+            aria-labelledby="submit-label"
             avatarProps={{ radius: "lg", src: user.avatar }}
             description={user.email}
             name={cellValue}
@@ -173,27 +187,27 @@ const Order = () => {
         );
       case "status":
         return (
-            <Link to={`Item/${user.id}`} className="text-slate-300">
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            <div
-              style={{ backgroundColor: statusColorMap[user.status] }}
-              className="rounded-lg p-1"
+          <Link to={`Item/${user.id}`} className="text-slate-300">
+            <Chip
+              className="capitalize"
+              color={statusColorMap[user.status]}
+              size="sm"
+              variant="flat"
             >
-              {cellValue}
-            </div>
-          </Chip>
-              </Link>
+              <div
+                style={{ backgroundColor: statusColorMap[user.status] }}
+                className="rounded-lg p-1"
+              >
+                {cellValue}
+              </div>
+            </Chip>
+          </Link>
         );
       case "actions":
         return (
           <div className="relative flex justify-end items-center gap-2">
-            <Dropdown  aria-labelledby="submit-label" backdrop="blur">
-              <DropdownTrigger  aria-labelledby="submit-label" >
+            <Dropdown aria-labelledby="submit-label" backdrop="blur">
+              <DropdownTrigger aria-labelledby="submit-label">
                 <Button isIconOnly size="sm" variant="light">
                   <VerticalDotsIcon className="text-default-300" />
                 </Button>
@@ -246,7 +260,8 @@ const Order = () => {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex justify-between gap-3 items-end">
-          <Input  aria-labelledby="submit-label"
+          <Input
+            aria-labelledby="submit-label"
             isClearable
             className="w-full sm:max-w-[44%] border-2 border-slate-400 rounded-xl"
             placeholder="Search by name..."
@@ -261,8 +276,11 @@ const Order = () => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Dropdown backdrop="blur"  aria-labelledby="submit-label">
-              <DropdownTrigger  aria-labelledby="submit-label" className="hidden sm:flex">
+            <Dropdown backdrop="blur" aria-labelledby="submit-label">
+              <DropdownTrigger
+                aria-labelledby="submit-label"
+                className="hidden sm:flex"
+              >
                 <Button
                   endContent={<FontAwesomeIcon icon={faChevronDown} />}
                   variant="flat"
@@ -285,8 +303,11 @@ const Order = () => {
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Dropdown backdrop="blur"  aria-labelledby="submit-label">
-              <DropdownTrigger  aria-labelledby="submit-label" className="hidden sm:flex">
+            <Dropdown backdrop="blur" aria-labelledby="submit-label">
+              <DropdownTrigger
+                aria-labelledby="submit-label"
+                className="hidden sm:flex"
+              >
                 <Button
                   endContent={<ChevronDownIcon className="text-small" />}
                   variant="flat"
@@ -303,7 +324,10 @@ const Order = () => {
                 onSelectionChange={setVisibleColumns}
               >
                 {columns.map((column) => (
-                  <DropdownItem key={column.uid} className="capitalize font-bold">
+                  <DropdownItem
+                    key={column.uid}
+                    className="capitalize font-bold"
+                  >
                     {capitalize(column.name)}
                   </DropdownItem>
                 ))}
@@ -347,12 +371,15 @@ const Order = () => {
             ? "All items selected"
             : `${selectedKeys.size} of ${filteredItems.length} selected`}
         </span>
-        <Pagination  aria-labelledby="submit-label"
+        <Pagination
+          aria-labelledby="submit-label"
           isCompact
           showControls
           showShadow
           color="primary"
-          classNames={{cursor: "bg-[#6542fd] shadow-inner text-white rounded-xl "}}
+          classNames={{
+            cursor: "bg-[#6542fd] shadow-inner text-white rounded-xl ",
+          }}
           page={page}
           total={pages}
           onChange={setPage}
@@ -380,7 +407,8 @@ const Order = () => {
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
   return (
     <div className="w-[1350px] h-full  m-auto flex flex-col mt-4">
-      <Breadcrumbs  aria-labelledby="submit-label"
+      <Breadcrumbs
+        aria-labelledby="submit-label"
         isDisabled
         radius="lg"
         variant="solid"
@@ -395,18 +423,33 @@ const Order = () => {
         <div className="text-3xl font-bold">Sales orders</div>
         <div className="font-bold font-serif mt-3">At a glance</div>
         <div className="flex flex-row w-full gap-2 justify-center mt-5 mb-10">
-          <Card  aria-labelledby="submit-label"
+          <Card
+            aria-labelledby="submit-label"
             className={`w-[400px] border-2 bg-white text-black border-slate-200 rounded-xl p-2 shadow-lg`}
           >
-            <CardHeader className="flex gap-3 justify-between h-[60px]"  aria-labelledby="submit-label">
+            <CardHeader
+              className="flex gap-3 justify-between h-[60px]"
+              aria-labelledby="submit-label"
+            >
               <div className="flex flex-col">
                 <div className="text-xs items-start flex font-[500] text-slate-500">
-                  Complete orders
+                  Pending orders
                 </div>
                 <p className="text-sm text-slate-800 font-mono flex text-default-500 justify-start ">
                   <div className="flex flex-col items-start">
                     <p className="text-2xl font-bold flex justify-start ">
-                      $11,720,00
+                      {orders
+                        .filter(
+                          (el) =>
+                            el.status == "Pending" &&
+                            new Date(el.created_at)
+                              .toISOString()
+                              .split("T")[0] ===
+                              new Date().toISOString().split("T")[0]
+                        )
+                        .reduce((acc, el) => acc + el.total_amount, 0)
+                        .toLocaleString("vi-VN")}{" "}
+                      vnd
                     </p>
                   </div>
                 </p>
@@ -420,13 +463,33 @@ const Order = () => {
             </CardHeader>
             <CardFooter>
               <Progress
-               aria-labelledby="submit-label"
+                aria-labelledby="submit-label"
                 label={
-                  <div className="text-xs text-slate-300">10 of 38 records</div>
+                  <div className="text-xs text-slate-300">
+                    {
+                      orders.filter(
+                        (el) =>
+                          el.status == "Prepare" &&
+                          new Date(el.created_at)
+                            .toISOString()
+                            .split("T")[0] ===
+                            new Date().toISOString().split("T")[0]
+                      ).length
+                    }{" "}
+                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ===
+                        new Date().toISOString().split("T")[0]).length} records
+                  </div>
                 }
                 size="sm"
-                value={4000}
-                maxValue={10000}
+                value={orders
+                  .filter(
+                    (el) =>
+                      el.status == "Pending" &&
+                      new Date(el.created_at).toISOString().split("T")[0] ===
+                        new Date().toISOString().split("T")[0]
+                  )
+                  .reduce((acc, el) => acc + el.total_amount, 0)}
+                maxValue={10000000}
                 showValueLabel={true}
                 radius="lg"
                 classNames={{
@@ -445,12 +508,23 @@ const Order = () => {
             <CardHeader className="flex gap-3 justify-between h-[60px]">
               <div className="flex flex-col">
                 <div className="text-xs items-start flex font-[500]  text-blue-400">
-                  Complete orders
+                  Shipping orders
                 </div>
                 <p className="text-sm text-slate-800 font-mono flex text-default-500 justify-start ">
                   <div className="flex flex-col items-start">
                     <p className="text-2xl font-bold flex justify-start text-blue-800">
-                      $11,720,00
+                      {orders
+                        .filter(
+                          (el) =>
+                            el.status == "Shipping" &&
+                            new Date(el.created_at)
+                              .toISOString()
+                              .split("T")[0] ===
+                              new Date().toISOString().split("T")[0]
+                        )
+                        .reduce((acc, el) => acc + el.total_amount, 0)
+                        .toLocaleString("vi-VN")}{" "}
+                      vnd
                     </p>
                   </div>
                 </p>
@@ -464,13 +538,33 @@ const Order = () => {
             </CardHeader>
             <CardFooter>
               <Progress
-               aria-labelledby="submit-label"
+                aria-labelledby="submit-label"
                 label={
-                  <div className="text-xs text-slate-300">10 of 38 records</div>
+                  <div className="text-xs text-slate-300">
+                    {
+                      orders.filter(
+                        (el) =>
+                          el.status == "Shipping" &&
+                          new Date(el.created_at)
+                            .toISOString()
+                            .split("T")[0] ===
+                            new Date().toISOString().split("T")[0]
+                      ).length
+                    }{" "}
+                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ===
+                        new Date().toISOString().split("T")[0]).length} records
+                  </div>
                 }
                 size="sm"
-                value={4000}
-                maxValue={10000}
+                value={orders
+                  .filter(
+                    (el) =>
+                      el.status == "Shipping" &&
+                      new Date(el.created_at).toISOString().split("T")[0] ===
+                        new Date().toISOString().split("T")[0]
+                  )
+                  .reduce((acc, el) => acc + el.total_amount, 0)}
+                maxValue={10000000}
                 showValueLabel={true}
                 radius="lg"
                 classNames={{
@@ -483,7 +577,7 @@ const Order = () => {
               />
             </CardFooter>
           </Card>
-            <Card
+          <Card
             className={`w-[400px] border-2 bg-white text-black border-slate-200 rounded-xl p-2 shadow-lg`}
           >
             <CardHeader className="flex gap-3 justify-between h-[60px]">
@@ -494,7 +588,18 @@ const Order = () => {
                 <p className="text-sm text-slate-800 font-mono flex text-default-500 justify-start ">
                   <div className="flex flex-col items-start">
                     <p className="text-2xl font-bold flex justify-start text-green-800">
-                      $11,720,00
+                      {orders
+                        .filter(
+                          (el) =>
+                            el.status == "Completed" &&
+                            new Date(el.created_at)
+                              .toISOString()
+                              .split("T")[0] ===
+                              new Date().toISOString().split("T")[0]
+                        )
+                        .reduce((acc, el) => acc + el.total_amount, 0)
+                        .toLocaleString("vi-VN")}{" "}
+                      vnd
                     </p>
                   </div>
                 </p>
@@ -508,13 +613,33 @@ const Order = () => {
             </CardHeader>
             <CardFooter>
               <Progress
-               aria-labelledby="submit-label"
+                aria-labelledby="submit-label"
                 label={
-                  <div className="text-xs text-slate-300">10 of 38 records</div>
+                  <div className="text-xs text-slate-300">
+                    {
+                      orders.filter(
+                        (el) =>
+                          el.status == "Completed" &&
+                          new Date(el.created_at)
+                            .toISOString()
+                            .split("T")[0] ===
+                            new Date().toISOString().split("T")[0]
+                      ).length
+                    }{" "}
+                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ===
+                        new Date().toISOString().split("T")[0]).length} records
+                  </div>
                 }
                 size="sm"
-                value={4000}
-                maxValue={10000}
+                value={orders
+                  .filter(
+                    (el) =>
+                      el.status == "Completed" &&
+                      new Date(el.created_at).toISOString().split("T")[0] ===
+                        new Date().toISOString().split("T")[0]
+                  )
+                  .reduce((acc, el) => acc + el.total_amount, 0)}
+                maxValue={100000000}
                 showValueLabel={true}
                 radius="lg"
                 classNames={{
@@ -537,11 +662,11 @@ const Order = () => {
           bottomContent={bottomContent}
           bottomContentPlacement="outside"
           classNames={{
-    table: "border-[2px] border-slate-300 rounded-lg",
-    thead: "bg-slate-200 rounded-t-lg",
-    tbody: "rounded-b-lg",
-    td: "border-b-[2px] border-slate-200 p-3"
-  }}
+            table: "border-[2px] border-slate-300 rounded-lg",
+            thead: "bg-slate-200 rounded-t-lg",
+            tbody: "rounded-b-lg",
+            td: "border-b-[2px] border-slate-200 p-3",
+          }}
           selectedKeys={selectedKeys}
           selectionMode="multiple"
           sortDescriptor={sortDescriptor}
@@ -565,9 +690,7 @@ const Order = () => {
             {(item) => (
               <TableRow key={item.id}>
                 {(columnKey) => (
-                  <TableCell>
-                  {renderCell(item, columnKey)}
-                  </TableCell>
+                  <TableCell>{renderCell(item, columnKey)}</TableCell>
                 )}
               </TableRow>
             )}

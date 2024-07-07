@@ -5,8 +5,6 @@ import { NextUIProvider } from "@nextui-org/react";
 import App from "./App";
 import "./index.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dashboard from "./Component/Dashboard/index";
-import ListProduct from "./Component/Product/ListProduct";
 import Value from "./Component/Dashboard/value";
 import Chart from "./Component/Dashboard/chart";
 import Product from './Component/Product/index'
@@ -25,6 +23,7 @@ import Item from "./Component/Order/Item";
 import Promotion from "./Component/Promotion/Promotion";
 import ProductSale from "./Component/Promotion/ProductSale";
 import AddnewPromotion from "./Component/Promotion/AddnewPromotion";
+import Category from "./Component/Category/Category";
 ReactDOM.createRoot(document.getElementById("root")).render(
     <NextUIProvider>
   <Provider store={store}>
@@ -48,6 +47,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
               {/* <Route path="Update" element={<AddProduct />} /> */}
             </Route>
             <Route path="/custumer" element={<Custumer />}>
+            </Route>
+            <Route path="/Category" element={<Category />}>
             </Route>
             {/* <Route path="/order" element={<PregresUI />}>
             </Route> */}

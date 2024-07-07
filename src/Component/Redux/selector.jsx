@@ -9,3 +9,6 @@ export const custumer=(state)=>state.custumer.custumer;
 export const roles=(state)=>state.custumer.Roles;
 export const Orders=(state)=>state.order.order;
 export const Sale=(state)=>state.sale.sale;
+export const Inventory=(state)=>state.product.inventory;
+export const Statistical=(state)=>state.statistical.statistical;
+export const Statisticalgender=(state)=>state.statistical.gender;

@@ -5,7 +5,7 @@ import { faBarsStaggered } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function App({ text,icon,number ,value, content, bg, color}) {
   return (
-    <Card className={`w-[400px] border-2 bg-${bg} text-${text} border-slate-400 rounded-xl p-2 shadow-lg`}> 
+    <Card className={`w-[350px] border-2 bg-${bg} text-${text} border-slate-400 rounded-xl p-2 shadow-lg`}> 
       <CardHeader className="flex gap-3 justify-between h-[60px]">
         
         <div className="flex flex-col">

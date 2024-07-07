@@ -43,12 +43,19 @@ const Item = () => {
     useLocation().pathname.split("/")[
       useLocation().pathname.split("/").length - 1
     ];
-  const order = useSelector(Orders).find((el) => el.orders_id == location);
-  const [loading,setLoading]=useState(false)
-  const customer = useSelector(custumer).find(
-    (el) => el.account_id == order.account
-  );
-  const Product = useSelector(product);
+    const order = useSelector(Orders).find((el) => el.orders_id == location);
+    const [loading,setLoading]=useState(false)
+    const customer = useSelector(custumer).find(
+      (el) => el.account_id == order.account
+    );
+    const Product = useSelector(product);
+//     order.orderItems.map((el) => {
+//   const filteredProducts = Product.find((el1) =>
+//     el1.productVersion.filter((el2) => el2.productVersion_id == el.productVersion)
+//   ).imagesMap[0].image_urlString
+
+//   console.log(filteredProducts);
+// });
   const handleCancle=async ()=>{
     setLoading(true)
     await dispatch(OrderChangeStatus({
@@ -88,8 +95,7 @@ const Item = () => {
       <div className="flex flex-col items-start">
         <Button onClick={()=>navigate("/order")} className="border-[2px] border-slate-400">
           <Chip  aria-labelledby="submit-label"
-            startContent={<FontAwesomeIcon onClick={navigate('/order')} icon={faReplyAll} />}
-           
+            startContent={<FontAwesomeIcon onClick={navigate('/order')} icon={faReplyAll} />} 
           >
             Back
           </Chip>
@@ -220,9 +226,9 @@ const Item = () => {
                      aria-labelledby="submit-label"
                       avatarProps={{
                         radius: "lg",
-                        src: Product.find(
-                          (el1) => el1.product_id == el.productVersion
-                        ).imagesMap[0].image_urlString,
+                        src: Product.find((el1) =>
+    el1.productVersion.some((el2) => el2.productVersion_id === el.productVersion)
+  ).imagesMap[0].image_urlString,
                       }}
                       description={
                         <div className="flex flex-row w-full gap-1">

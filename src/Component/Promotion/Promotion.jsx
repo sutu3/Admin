@@ -25,7 +25,7 @@ import {
 import {VerticalDotsIcon} from "../Custumer/VerticalDotsIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAnglesRight, faBagShopping, faHouse, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Sale } from "../Redux/selector.jsx";
+import { Sale, Statistical } from "../Redux/selector.jsx";
 import { useSelector } from "react-redux";
 import { Link,useNavigate } from "react-router-dom";
 const statusColorMap = {
@@ -61,6 +61,7 @@ const statusOptions = [
 const INITIAL_VISIBLE_COLUMNS = ["name","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
 
 const Promotion=()=> {
+  
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));

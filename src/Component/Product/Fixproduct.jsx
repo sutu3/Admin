@@ -11,7 +11,7 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,useNavigate } from "react-router-dom";
 import { PurchaseOrder } from "../Redux/selector";
 import { useSelector,useDispatch } from "react-redux";
 import { toast } from "react-toastify";
@@ -29,6 +29,7 @@ const columns = [
   { name: "Price_sale", uid: "price_sale" },
 ];
 const Fixproduct = () => {
+  const navigate=useNavigate()
     const dispatch = useDispatch();
   const [number, setnumber] = useState(1);
   const [selected, setselected] = useState([]);
@@ -75,6 +76,16 @@ const Fixproduct = () => {
   // setlist(arr1)
   const handleImport=async()=>{
     await dispatch(ImportPurchase({data:list,id:location}));
+    navigate('/Product/Import')
+    toast.success('Action Change Complete', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
   }
   return (
     <div className="w-[1250px] h-full flex flex-row">

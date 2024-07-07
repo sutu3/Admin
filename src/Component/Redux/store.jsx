@@ -4,6 +4,7 @@ import Purchar from '../Redux/PurchaseSlice'
 import CustumerSlice from './CustummerSlice.jsx'
 import OrderSlice from './OrderSlice.jsx'
 import SaleSlice from './SalesSlice.jsx'
+import statisticalSlice from './statisticalSlixe.jsx'
 const store=configureStore({
     reducer:{
        product:ProductSlice.reducer,
@@ -11,6 +12,7 @@ const store=configureStore({
        custumer:CustumerSlice.reducer,
        order:OrderSlice.reducer,
        sale:SaleSlice.reducer,
+       statistical:statisticalSlice.reducer
     }
 })
 export default store

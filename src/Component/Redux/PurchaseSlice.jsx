@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Inventory } from "./ProductSlice";
 const url = "http://26.232.136.42:8080/api";
 const PurchaseSlice = createSlice({
   name: "purchase",
@@ -972,11 +973,20 @@ export const ImportPurchase = (payload) => {
       const month = String(today.getMonth() + 1).padStart(2, "0"); // Đảm bảo tháng luôn có 2 chữ số
       const day = String(today.getDate()).padStart(2, "0");
       console.log(payload);
-      const idproduct = payload.data[0].productID;
-      const categories = getState().product.product.find(
-        (el) => el.product_id == idproduct
-      ).categories;
-      payload.data.map(async (el) => {
+      const arr = [];
+      for (const el of payload.data) {
+        const idproduct = el.productID;
+        if (!arr.includes(el.productVersion)) {
+          arr.push(el.productVersion);
+        }
+        const product = getState().product.product.find(
+          (el) => el.product_id == idproduct
+        );
+        if (!product) {
+          throw new Error(`Product with id ${idproduct} not found`);
+        }
+        const categories = product.categories;
+        console.log(categories);
         await dispatch(
           UpdateQuantityAndPrice({
             quantity: el.quantity_real,
@@ -987,34 +997,57 @@ export const ImportPurchase = (payload) => {
             sale_date_end: null,
           })
         );
+        console.log(el);
+        const category = categories.find(
+          (el1) => el1.color === el.color && el1.sizeEnum === el.sizeEnum
+        );
+        if (!category) {
+          throw new Error(
+            `Category with color ${el.color} and sizeEnum ${el.sizeEnum} not found`
+          );
+        }
+        console.log(category);
         await dispatch(
           UpdateQualityOfVarient({
             variants_id: el.variant,
-            colorID: categories.find(
-              (el1) => el1.color == el1.color && el1.sizeEnum == el.sizeEnum
-            ).catetoryColor,
-            sizeID: categories.find(
-              (el1) => el1.color == el1.color && el1.sizeEnum == el.sizeEnum
-            ).catetorySize,
+            colorID: category.catetoryColor,
+            sizeID: category.catetorySize,
             productversion: el.productVersion,
             quantity_in_stock: parseInt(el.quantity_real),
           })
         );
+
         await dispatch(
           CreateInventory({
             change_amount: parseInt(el.quantity_real),
             event_type: "Nhập_hàng",
             order_id: 0,
             inventoryVariant: el.variant,
+            amount: parseInt(el.quantity_real),
           })
         );
+
         await dispatch(
           UpdateQuantityOrdetItemPurchase({
             purchase_order_items_id: el.purchase_order_items_id,
             quantity_real: el.quantity_real,
           })
         );
-      });
+      }
+      for (const version of arr) {
+        const quantityInStock = payload.data
+          .filter((el) => el.productVersion === version)
+          .reduce((acc, el) => acc + el.quantity_real, 0);
+        const el = payload.data.find((el) => el.productVersion === version);
+        await dispatch(
+          UpdateQualityOfVersion({
+            productVersion_id: version,
+            version_name: el.version_name,
+            quantity_in_stock: quantityInStock,
+            productID: el.productID,
+          })
+        );
+      }
       await dispatch(
         UpdateTotalPriceOrderPurchase({
           purchase_orders_id: payload.id,
@@ -1024,9 +1057,12 @@ export const ImportPurchase = (payload) => {
           ),
         })
       );
+
       await dispatch(ChangeStatusToReceive(payload.id));
+      await dispatch(Inventory())
     } catch (error) {
-      toast.error(error, {
+      console.error(error); // Log lỗi ra console để kiểm tra
+      toast.error(error.message, {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -1038,6 +1074,8 @@ export const ImportPurchase = (payload) => {
     }
   };
 };
+
+
 export const Delete = (payload) => {
   return async function Check(dispatch, getState) {
     const arr = getState().purchase.OrderPurchase.filter(

@@ -54,7 +54,7 @@ const ImportProduct = () => {
               )}
             </TableHeader>
             <TableBody>
-              {Order.slice((number - 1) *7,(number - 1) *7 + 7).map((el, index) => (
+              {Order.slice((number - 1) *7,(number - 1) *7 + 7).reverse().map((el, index) => (
                 <TableRow
                   key={index}
                   className="hover:bg-blue-100"

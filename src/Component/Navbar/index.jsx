@@ -11,54 +11,57 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faShirt, faCartFlatbed,faCubesStacked } from "@fortawesome/free-solid-svg-icons";
 import { Badge } from "@nextui-org/react";
 import { ToastContainer } from "react-toastify";
-
-const data = [
-  {
-    content: "Dashboard",
-    link: '/Dashboard',
-    icon: faHouseChimneyUser,
-    flat:false
-  },
-  {
-    content: "Product",
-    link: "/Product/Add",
-    icon: faShirt,
-    flat:false
-  },
-  {
-    content: "Category",
-    link: "/",
-    icon: faClipboardList,
-    flat:false
-  },
-  {
-    content: "Order",
-    link: "/order",
-    icon: faCartFlatbed,
-    flat:true,
-    message:4
-  },
-  {
-    content: "Customer",
-    link: "/custumer",
-    icon: faUser,
-    flat:false
-  },
-  {
-    content: "Promotion",
-    link: "/promotion",
-    icon:faTag,
-    flat:false
-  },
-  {
-    content: "Employee",
-    link: "/",
-    icon: faUserTie,
-    flat:false
-  },
-];
+import { useSelector } from "react-redux";
+import { Orders } from "../Redux/selector";
 
 const Index = () => {
+  const order=useSelector(Orders).filter((el)=>el.status=='Pending')
+  console.log(order)
+  const data = [
+    {
+      content: "Dashboard",
+      link: '/Dashboard',
+      icon: faHouseChimneyUser,
+      flat:false
+    },
+    {
+      content: "Product",
+      link: "/Product/Add",
+      icon: faShirt,
+      flat:false
+    },
+    {
+      content: "Category",
+      link: "/category",
+      icon: faClipboardList,
+      flat:false
+    },
+    {
+      content: "Order",
+      link: "/order",
+      icon: faCartFlatbed,
+      flat:true,
+      message:order.length
+    },
+    {
+      content: "Customer",
+      link: "/custumer",
+      icon: faUser,
+      flat:false
+    },
+    {
+      content: "Promotion",
+      link: "/promotion",
+      icon:faTag,
+      flat:false
+    },
+    {
+      content: "Employee",
+      link: "/",
+      icon: faUserTie,
+      flat:false
+    },
+  ];
     const location = useLocation();
     console.log(location.pathname.split('/')[1])
     const [index1, setindex] = useState(data.findIndex((el)=>el.link.includes(location.pathname.split('/')[1])));

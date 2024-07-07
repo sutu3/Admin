@@ -1,7 +1,8 @@
 import { Card, CardBody, CardFooter, Chip, CircularProgress } from '@nextui-org/react';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
-
+import { Orders } from '../Redux/selector';
+import { useSelector } from 'react-redux';
 // Giả sử bạn có dữ liệu về đơn hàng thành công và thất bại
 const orderData = [
   { name: 'Thành công', value: 120 }, // Số lượng đơn hàng thành công
@@ -10,11 +11,16 @@ const orderData = [
 
 const COLORS = ['#0088FE', '#FF8042']; // Màu cho thành công và thất bại
 
-export default class Example extends PureComponent {
-  static demoUrl = 'https://codesandbox.io/s/pie-chart-with-padding-angle-7ux0o';
 
-  render() {
-    return (
+const Piechart = () => {
+  const orders=useSelector(Orders)
+  const [success,setsuccess]=useState([])
+  console.log(success)
+  useEffect(()=>{
+    const arr=orders.filter((el)=>el.status=='Completed')
+    setsuccess(arr)
+  },[orders])
+  return (
      <Card className="w-[400px] h-[310px] rounded-2xl border-none bg-gradient-to-br  from-blue-500 to-fuchsia-500">
       <CardBody className="justify-center items-center pb-0">
       <CardFooter className="justify-center items-center pt-0">
@@ -43,5 +49,6 @@ export default class Example extends PureComponent {
       
     </Card>
     );
-  }
 }
+
+export default Piechart
