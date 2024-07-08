@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { product, Size } from "../Redux/selector";
+import { product, Size,Infor } from "../Redux/selector";
 import {
   Button,
   Card,
@@ -35,6 +35,8 @@ import { Tooltip } from "recharts";
 import { EditIcon } from "./EditIcon";
 import { GetProduct, UpdateCategories, UpdateCategoriesPriceORDelete } from "../Redux/ProductSlice";
 import { toast } from "react-toastify";
+import CustumerSlice, { checkPermosion } from "../Redux/CustummerSlice";
+import { useNavigate } from "react-router-dom";
 const columns1 = [
   { name: "Size", uid: "size" },
   { name: "Color", uid: "color" },
@@ -49,6 +51,8 @@ const columns2 = [
   { name: "Action", uid: "action" },
 ];
 const UpdateProduct = () => {
+  const navigate = useNavigate();
+  const infor=useSelector(Infor)
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
@@ -66,7 +70,6 @@ const UpdateProduct = () => {
   const [select, setselected] = useState([]);
   const [categories, setcategories] = useState({});
 
-  console.log(size1.find((el1) => el1.size_id == 1).size_name);
 const handleActionClick = async () => {
     console.log(flat);
     setLoading(true);
@@ -163,7 +166,6 @@ const handleActionClick = async () => {
     setsize(arr);
   };
 
-  console.log(size1.find((el) => el.size_id == 1).size_name);
 
   return (
     <div className="w-[1250px] h-full -translate-x-10 flex flex-col gap-4">
@@ -270,11 +272,44 @@ const handleActionClick = async () => {
         <div>Add New Varient</div>
         <div>
           <Button
-            onClick={async () => {
-              await dispatch(
+          onClick={async () => {
+                const check = await dispatch(
+                    checkPermosion({
+                      account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                      id: 8,
+                    })
+                  );
+                  if(check)
+                  {
+                    const result = await dispatch(
+                  checkPermosion({
+                    account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                    id: 2,
+                  })
+                );
+                result.payload
+                  ?
+                  await dispatch(
                 UpdateCategories({ data: list, idproduct: location })
-              );
-            }}
+              )
+                  : toast.info(`Your Permission Is Not Enough Affect`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                    navigate('/Product/Add')
+                  }
+                else{
+                  localStorage.removeItem('login')
+                  dispatch(CustumerSlice.actions.changeState(false))
+                  window.location.reload();
+                }
+              }}
+            
           >
             Update Product
           </Button>

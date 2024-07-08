@@ -76,7 +76,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 const Order = () => {
-  const orders = useSelector(Orders).filter((el)=>el.status!='Prepare');
+  const orders = useSelector(Orders).filter((el) => el.status != "Prepare");
   const Customers = useSelector(custumer);
   // orders.filter((el)=>el.status=='Completed').map((el)=>(new Date(el.created_at)).toISOString().split('T')[0]==(new Date().toISOString().split('T')[0]))
   const users = orders.map((el) => {
@@ -111,10 +111,8 @@ const Order = () => {
     direction: "ascending",
   });
   const [page, setPage] = useState(1);
-console.log(orders
-                        .map(
-                          (el) =>
-                            ({id:el.orders_id,date: new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0]})))
+  // console.log(orders.map((el) =>
+  //                             ({id:el.orders_id,date: })))
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
@@ -445,9 +443,7 @@ console.log(orders
                         .filter(
                           (el) =>
                             el.status == "Pending" &&
-                            new Date(el.created_at)
-                              .toISOString()
-                              .split("T")[0] ===
+                           new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
                               new Date().toISOString().split("T")[0]
                         )
                         .reduce((acc, el) => acc + el.total_amount, 0)
@@ -472,15 +468,20 @@ console.log(orders
                     {
                       orders.filter(
                         (el) =>
-                          el.status == "Prepare" &&
-                          new Date(el.created_at)
-                            .toISOString()
-                            .split("T")[0] ===
+                          el.status == "Pending" &&
+                          new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
                             new Date().toISOString().split("T")[0]
                       ).length
                     }{" "}
-                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ===
-                        new Date().toISOString().split("T")[0]).length} records
+                    of{" "}
+                    {
+                      orders.filter(
+                        (el) =>
+                          new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
+                          new Date().toISOString().split("T")[0]
+                      ).length
+                    }{" "}
+                    records
                   </div>
                 }
                 size="sm"
@@ -520,9 +521,7 @@ console.log(orders
                         .filter(
                           (el) =>
                             el.status == "Shipping" &&
-                            new Date(el.created_at)
-                              .toISOString()
-                              .split("T")[0] ===
+                            new Date(new Date(el.shipping_at).getTime() - (new Date(el.shipping_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
                               new Date().toISOString().split("T")[0]
                         )
                         .reduce((acc, el) => acc + el.total_amount, 0)
@@ -548,14 +547,19 @@ console.log(orders
                       orders.filter(
                         (el) =>
                           el.status == "Shipping" &&
-                          new Date(el.created_at)
-                            .toISOString()
-                            .split("T")[0] ===
+                          new Date(new Date(el.shipping_at).getTime() - (new Date(el.shipping_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
                             new Date().toISOString().split("T")[0]
                       ).length
                     }{" "}
-                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ===
-                        new Date().toISOString().split("T")[0]).length} records
+                    of{" "}
+                    {
+                      orders.filter(
+                        (el) =>
+                          new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
+                          new Date().toISOString().split("T")[0]
+                      ).length
+                    }{" "}
+                    records
                   </div>
                 }
                 size="sm"
@@ -595,7 +599,11 @@ console.log(orders
                         .filter(
                           (el) =>
                             el.status == "Completed" &&
-                            new Date(el.complete_at)
+                            new Date(
+                              new Date(el.complete_at).getTime() -
+                                new Date(el.complete_at).getTimezoneOffset() *
+                                  60000
+                            )
                               .toISOString()
                               .split("T")[0] ===
                               new Date().toISOString().split("T")[0]
@@ -623,14 +631,19 @@ console.log(orders
                       orders.filter(
                         (el) =>
                           el.status == "Completed" &&
-                          new Date(el.complete_at)
-                            .toISOString()
-                            .split("T")[0] ===
+                         new Date(new Date(el.complete_at).getTime() - (new Date(el.complete_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
                             new Date().toISOString().split("T")[0]
                       ).length
                     }{" "}
-                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ==
-                        new Date().toISOString().split("T")[0]).length} records
+                    of{" "}
+                    {
+                      orders.filter(
+                        (el) =>
+                          new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
+                          new Date().toISOString().split("T")[0]
+                      ).length
+                    }{" "}
+                    records
                   </div>
                 }
                 size="sm"
@@ -638,7 +651,7 @@ console.log(orders
                   .filter(
                     (el) =>
                       el.status == "Completed" &&
-                      new Date(el.complete_at).toISOString().split("T")[0] ===
+                      new Date(new Date(el.complete_at).getTime() - (new Date(el.complete_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ===
                         new Date().toISOString().split("T")[0]
                   )
                   .reduce((acc, el) => acc + el.total_amount, 0)}

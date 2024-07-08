@@ -25,9 +25,11 @@ import {
 import {VerticalDotsIcon} from "../Custumer/VerticalDotsIcon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAnglesRight, faBagShopping, faHouse, faMagnifyingGlass, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { Sale, Statistical } from "../Redux/selector.jsx";
-import { useSelector } from "react-redux";
+import { Sale, Statistical,Infor } from "../Redux/selector.jsx";
+import { useSelector,useDispatch } from "react-redux";
 import { Link,useNavigate } from "react-router-dom";
+import CustumerSlice, { checkPermosion } from "../Redux/CustummerSlice.jsx";
+import { toast } from "react-toastify";
 const statusColorMap = {
   active: "success",
   paused: "danger",
@@ -61,7 +63,8 @@ const statusOptions = [
 const INITIAL_VISIBLE_COLUMNS = ["name","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
 
 const Promotion=()=> {
-  
+  const infor=useSelector(Infor)
+  const dispatch=useDispatch()
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
   const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -223,7 +226,39 @@ const Promotion=()=> {
               className="bg-foreground text-background"
               endContent={<FontAwesomeIcon icon={faPlus} />}
               size="sm"
-              onClick={()=>navigate('/promotion/addnew')}
+              onClick={async () => {
+                const check = await dispatch(
+                    checkPermosion({
+                      account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                      id: 8,
+                    })
+                  );
+                  if(check.payload)
+                  {
+                    const result = await dispatch(
+                  checkPermosion({
+                    account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                    id: 12,
+                  })
+                );
+                result.payload
+                  ? navigate('/promotion/addnew')
+                  : toast.info(`Your Permission Is Not Enough Affect`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                  }
+                else{
+                  localStorage.removeItem('login')
+                  dispatch(CustumerSlice.actions.changeState(false))
+                  window.location.reload();
+                }
+              }}
             >
               Add New
             </Button>

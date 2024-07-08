@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { PurchaseOrder } from '../Redux/selector';
+import { useSelector,useDispatch } from 'react-redux';
+import { PurchaseOrder,Infor } from '../Redux/selector';
 import { Checkbox, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
 import Date from '../Date/index'
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import CustumerSlice, { checkPermosion } from '../Redux/CustummerSlice';
 const columns = [
   { name: "", uid: "checkbox" },
   { name: "Id Order", uid: "id" },
@@ -14,7 +16,9 @@ const columns = [
 ];
 
 const ImportProduct = () => {
+  const dispatch=useDispatch()
   const navigate=useNavigate()
+  const infor=useSelector(Infor)
   const Order = useSelector(PurchaseOrder);
   const [number,setnumber]=useState(1)
   console.log(Order);
@@ -58,7 +62,55 @@ const ImportProduct = () => {
                 <TableRow
                   key={index}
                   className="hover:bg-blue-100"
-                  onClick={() => {navigate(`/Product/Import/${el.purchase_orders_id}`)}}
+                    onClick={async () => {
+                const check = await dispatch(
+                    checkPermosion({
+                      account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                      id: 8,
+                    })
+                  );
+                  if(check)
+                  {
+                    const result = await dispatch(
+                  checkPermosion({
+                    account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                    id: 11,
+                  })
+                );
+                result.payload
+                  ?
+                    navigate(`/Product/Import/${el.purchase_orders_id}`)
+                  : toast.info(`Your Permission Is Not Enough Affect`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                    navigate('/Product/Add')
+                  }
+                else{
+                  localStorage.removeItem('login')
+                  dispatch(CustumerSlice.actions.changeState(false))
+                  window.location.reload();
+                }
+              }}
+                //   onClick={() => {
+                // infor.rolePermission.find(
+                //   (el) => el.permission == "Kiểm kê đơn nhập hàng"
+                // )
+                //   ? navigate(`/Product/Import/${el.purchase_orders_id}`)
+                //   : toast.info(`Your Permission Is Not Enough Affect`, {
+                //       position: "top-right",
+                //       autoClose: 2000,
+                //       hideProgressBar: false,
+                //       closeOnClick: true,
+                //       pauseOnHover: false,
+                //       draggable: true,
+                //       progress: undefined,
+                //     })}}
                 >
                   <TableCell>
                     <Checkbox

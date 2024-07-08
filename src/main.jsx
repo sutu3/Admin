@@ -33,7 +33,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/" element={<App />}>
             <Route path="/Dashboard" element={<Value />}>
               <Route path="Value" index element={<Value />} />
-              <Route path="Chart"  element={<Chart />} />
             </Route>
             <Route path="/Product" element={<Product />}>
               {/* <Route path="" index element={<ListProduct />} /> */}

@@ -49,21 +49,21 @@ const Value = () => {
   const [value, setvalue] = useState(
     parseDate(new Date().toISOString().split("T")[0])
   );
-  // console.log(accont.filter(
-  //               (el) =>
-  //                 new Date(el.created_at).toISOString().split("T")[0] ==
-  //                 (new Date()).setDate(today.getDate() - 1).toISOString().split("T")[0]
-  //             ).length)
+  console.log(value)
   const data = useSelector(Statistical);
   const order = useSelector(Orders);
   const Custumer = useSelector(custumer);
   console.log(order);
+   const today = new Date(value);
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  console.log(today)
   useEffect(() => {
     const fetchStatistical = async () => {
       try {
         // Giả sử data là kết quả từ API
-        const today = new Date().toISOString().split("T")[0];
-        const statisticalData = Object.entries(data[today] || {})
+        //const today = new Date().toISOString().split("T")[0];
+        const statisticalData = Object.entries(data[value] || {})
           .flatMap((el) =>
             el[1].map((el1) => ({
               name: el[0],
@@ -83,7 +83,7 @@ const Value = () => {
     };
 
     fetchStatistical();
-  }, [data, accont]);
+  }, [data, accont,value]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -92,15 +92,14 @@ const Value = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
+ 
   return (
     <div className="w-[1400px] h-full flex flex-col mt-5 translate-x-6 gap-5">
+    {/* <div>Thông Kê Doanh Thu Ngày {today}</div> */}
       <div className="w-[100%] flex flex-row  justify-around gap-2">
         <div className="w-[70%] h-full flex flex-col gap-3 ">
           <div className="w-[100%] flex flex-row items-center justify-around p-2  rounded-2xl shadow-inner shadow-slate-500 ">
-            <Chart />
+            <Chart value={value}/>
             <Calendar
               aria-label="Date (Controlled)"
               value={value}
@@ -116,8 +115,8 @@ const Value = () => {
             />
           </div>
           <div className="w-[100%] flex flex-row justify-around items-center p-2  rounded-2xl shadow-inner shadow-slate-500 ">
-            <Chart1 />
-            <Pie />
+            <Chart1 value={value}/>
+            <Pie value={value}/>
           </div>
         </div>
         <div className="w-fit p-2 h-full rounded-2xl shadow-inner shadow-slate-500 flex gap-5 flex-col ">
@@ -196,7 +195,7 @@ const Value = () => {
               order.filter(
                 (el) =>
                   el.status != "Prepare" &&
-                  new Date(el.created_at).toISOString().split("T")[0] ==
+                  new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
                     today.toISOString().split('T')[0]
               ).length
             }
@@ -204,13 +203,13 @@ const Value = () => {
               (order.filter(
                 (el) =>
                   el.status != "Prepare" &&
-                  new Date(el.created_at).toISOString().split("T")[0] ==
+                  new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
                     today.toISOString().split('T')[0]
               ).length /
                 order.filter(
                 (el) =>
                   el.status != "Prepare" &&
-                  new Date(el.created_at).toISOString().split("T")[0] ==
+                  new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
                     yesterday.toISOString().split('T')[0]
               ).length) *
               100
@@ -225,17 +224,17 @@ const Value = () => {
             number={
               accont.filter(
                 (el) =>
-                  new Date(el.created_at).toISOString().split("T")[0] ==
+                  new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
                   today.toISOString().split("T")[0]
               ).length
             }
             value={(accont.filter(
                 (el) =>
-                  new Date(el.created_at).toISOString().split("T")[0] ==
+                  new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
                   today.toISOString().split("T")[0]
               ).length/accont.filter(
                 (el) =>
-                  new Date(el.created_at).toISOString().split("T")[0] ==
+                  new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0] ==
                   yesterday.toISOString().split("T")[0]
               ).length)*100}
             icon={faUsers}

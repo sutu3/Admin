@@ -4,6 +4,7 @@ import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 import { useSelector } from 'react-redux';
 import { Statistical } from "../Redux/selector.jsx";
 
+// Custom bar shape for rounded corners
 const CustomBar = (props) => {
   const { fill, x, y, width, height } = props;
   return (
@@ -18,6 +19,7 @@ const CustomBar = (props) => {
   );
 };
 
+// Custom tooltip
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
@@ -35,7 +37,24 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const Example = () => {
+// Helper function to get the start of the current week
+const getStartOfWeek = (date) => {
+  const start = new Date(date);
+  const day = start.getDay();
+  const diff = start.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+  return new Date(start.setDate(diff));
+};
+
+// Helper function to format date as YYYY-MM-DD
+const formatDate = (date) => {
+  const d = new Date(date);
+  const month = `${d.getMonth() + 1}`.padStart(2, '0');
+  const day = `${d.getDate()}`.padStart(2, '0');
+  const year = d.getFullYear();
+  return [year, month, day].join('-');
+};
+
+const Example = ({value}) => {
   const [statistical, setStatistical] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,25 +64,33 @@ const Example = () => {
   useEffect(() => {
     const fetchStatistical = async () => {
       try {
-        // Giả sử data là kết quả từ API
-        const today = new Date().toISOString().split('T')[0];
-        const rawData = data[today] || {};
+        const startOfWeek = getStartOfWeek(value);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-        // Chuẩn bị dữ liệu cho biểu đồ
-        const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        const salesData = daysOfWeek.map(day => ({
-          name: day,
-          Sales: Object.entries(data).flatMap((el)=>
-         Object.entries(el[1]).flatMap((el2)=>el2[1].flatMap((el3)=>({
-          date:el[0],
-            name: el2[0],
-            money: el3.money,
-            quantity: el3.quantity,
-            sizeColor: el3.sizeColor,
-         }))))
-            .filter(item => new Date(item.date).getDay() === daysOfWeek.indexOf(day))
-            .reduce((acc, item) => acc + item.money, 0)
-        }));
+        const daysOfWeek = [ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun'];
+
+        // Filter and map data for the current week
+        const salesData = daysOfWeek.map((day, index) => {
+          const currentDate = new Date(startOfWeek);
+          currentDate.setDate(startOfWeek.getDate() + index);
+          const formattedDate = formatDate(currentDate);
+
+          const daySales = Object.entries(data)
+            .flatMap(el => Object.entries(el[1]).flatMap(el2 =>
+              el2[1].map(el3 => ({
+                date: el[0],
+                name: el2[0],
+                money: el3.money,
+                quantity: el3.quantity,
+                sizeColor: el3.sizeColor,
+              }))
+            ))
+            .filter(item => item.date === formattedDate)
+            .reduce((acc, item) => acc + item.money, 0);
+
+          return { name: day, Sales: daySales };
+        });
 
         setStatistical(salesData);
       } catch (error) {
@@ -74,7 +101,7 @@ const Example = () => {
     };
 
     fetchStatistical();
-  }, [data]);
+  }, [data,value]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -106,3 +133,4 @@ const Example = () => {
 };
 
 export default Example;
+

@@ -28,6 +28,8 @@ import { useDispatch } from "react-redux";
 import { OrderChangeStatus } from "../Redux/OrderSlice";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import CustumerSlice, { checkPermosion } from "../Redux/CustummerSlice";
+import { Infor } from "../Redux/selector";
 const statusColorMap = {
   Prepare: "#f5f7ff",
   Pending: "#fdefe6",
@@ -37,6 +39,7 @@ const statusColorMap = {
 };
 const Item = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
+    const infor=useSelector(Infor)
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location =
@@ -268,7 +271,39 @@ const Item = () => {
                 <div className="font-bold text-xl">{order.total_amount}vnd</div>
               </div>
               <div className={`w-1/2 flex flex-row gap-3 mt-10 items-end justify-end ${(order.status != "Completed" && order.status != "Cancel")?'':'hidden'}`}>
-                <Button  aria-labelledby="submit-label" className="text-[#f63b5e]" onPress={handleCancle}>Cancel</Button>
+                <Button  aria-labelledby="submit-label" className="text-[#f63b5e]" onClick={async () => {
+                const check = await dispatch(
+                    checkPermosion({
+                      account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                      id: 8,
+                    })
+                  );
+                  if(check)
+                  {
+                    const result = await dispatch(
+                  checkPermosion({
+                    account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                    id: 6,
+                  })
+                );
+                result.payload
+                  ? handleCancle()
+                  : toast.info(`Your Permission Is Not Enough Affect`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                  }
+                else{
+                  localStorage.removeItem('login')
+                  dispatch(CustumerSlice.actions.changeState(false))
+                  window.location.reload();
+                }
+              }}>Cancel</Button>
                 {loading ? (
               <Button
                 isLoading
@@ -300,7 +335,41 @@ const Item = () => {
                 Loading
               </Button>
             ) : (
-              <Button  aria-labelledby="submit-label" className="bg-[#0181ff] text-white" onPress={handleClickChange} >
+              <Button  aria-labelledby="submit-label" className="bg-[#0181ff] text-white"
+               onClick={async () => {
+                const check = await dispatch(
+                    checkPermosion({
+                      account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                      id: 8,
+                    })
+                  );
+                  if(check)
+                  {
+                    const result = await dispatch(
+                  checkPermosion({
+                    account_id: infor.account_id, // Bạn cần đảm bảo biến 'infor' đã được khai báo và có giá trị hợp lệ
+                    id: 6,
+                  })
+                );
+                result.payload
+                  ? handleClickChange()
+                  : toast.info(`Your Permission Is Not Enough Affect`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                  }
+                else{
+                  localStorage.removeItem('login')
+                  dispatch(CustumerSlice.actions.changeState(false))
+                  window.location.reload();
+                }
+              }}
+                >
                   Change State
                 </Button>
             )}

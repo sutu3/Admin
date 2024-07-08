@@ -2,15 +2,16 @@ import React, { PureComponent, useEffect, useState } from "react";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Statisticalgtype } from "../Redux/selector";
 import { useSelector } from "react-redux";
+import { parseDate } from "@internationalized/date";
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
-const Piechart = () => {
+const Piechart = ({value}) => {
   const type = useSelector(Statisticalgtype);
   const [data, setdata] = useState([]);
   useEffect(() => {
     const fetchStatistical = async () => {
       try {
-        const data1 = Object.entries(type[new Date().toISOString().split("T")[0]]).map(
+        const data1 = Object.entries(type[value]).map(
           (el) => ({ name: el[0], value: el[1].totalMoney })
         );
         setdata(data1);
@@ -19,7 +20,7 @@ const Piechart = () => {
       }
     };
     fetchStatistical();
-  }, []);
+  }, [value]);
   return (
     <PieChart
       width={300}
