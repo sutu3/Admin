@@ -111,7 +111,10 @@ const Order = () => {
     direction: "ascending",
   });
   const [page, setPage] = useState(1);
-
+console.log(orders
+                        .map(
+                          (el) =>
+                            ({id:el.orders_id,date: new Date(new Date(el.created_at).getTime() - (new Date(el.created_at).getTimezoneOffset() * 60000)).toISOString().split('T')[0]})))
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = useMemo(() => {
@@ -592,7 +595,7 @@ const Order = () => {
                         .filter(
                           (el) =>
                             el.status == "Completed" &&
-                            new Date(el.created_at)
+                            new Date(el.complete_at)
                               .toISOString()
                               .split("T")[0] ===
                               new Date().toISOString().split("T")[0]
@@ -620,13 +623,13 @@ const Order = () => {
                       orders.filter(
                         (el) =>
                           el.status == "Completed" &&
-                          new Date(el.created_at)
+                          new Date(el.complete_at)
                             .toISOString()
                             .split("T")[0] ===
                             new Date().toISOString().split("T")[0]
                       ).length
                     }{" "}
-                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ===
+                    of {orders.filter((el)=>new Date(el.created_at).toISOString().split("T")[0] ==
                         new Date().toISOString().split("T")[0]).length} records
                   </div>
                 }
@@ -635,7 +638,7 @@ const Order = () => {
                   .filter(
                     (el) =>
                       el.status == "Completed" &&
-                      new Date(el.created_at).toISOString().split("T")[0] ===
+                      new Date(el.complete_at).toISOString().split("T")[0] ===
                         new Date().toISOString().split("T")[0]
                   )
                   .reduce((acc, el) => acc + el.total_amount, 0)}

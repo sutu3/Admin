@@ -85,7 +85,7 @@ const Example = () => {
   }
 
   return (
-    <Card style={{ background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className="w-[580px] h-[300px] translate-x-3">
+    <Card style={{ background: 'linear-gradient(135deg, #39406d, #1c2037)', borderRadius: '20px' }} className="w-[580px] h-[300px] translate-x-7">
       <CardHeader>
         <div style={{ color: '#ffffff', fontWeight: 'bold' }}>Biểu Đồ Thống Kê</div>
       </CardHeader>

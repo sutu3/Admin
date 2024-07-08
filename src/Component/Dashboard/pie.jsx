@@ -1,54 +1,67 @@
-import { Card, CardBody, CardFooter, Chip, CircularProgress } from '@nextui-org/react';
-import React, { PureComponent, useEffect, useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { Orders } from '../Redux/selector';
-import { useSelector } from 'react-redux';
-// Giả sử bạn có dữ liệu về đơn hàng thành công và thất bại
-const orderData = [
-  { name: 'Thành công', value: 120 }, // Số lượng đơn hàng thành công
-  { name: 'Thất bại', value: 30 }, // Số lượng đơn hàng thất bại
-];
-
-const COLORS = ['#0088FE', '#FF8042']; // Màu cho thành công và thất bại
-
+import React, { PureComponent, useEffect, useState } from "react";
+import { PieChart, Pie, Sector, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Statisticalgtype } from "../Redux/selector";
+import { useSelector } from "react-redux";
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const Piechart = () => {
-  const orders=useSelector(Orders)
-  const [success,setsuccess]=useState([])
-  console.log(success)
-  useEffect(()=>{
-    const arr=orders.filter((el)=>el.status=='Completed')
-    setsuccess(arr)
-  },[orders])
+  const type = useSelector(Statisticalgtype);
+  const [data, setdata] = useState([]);
+  useEffect(() => {
+    const fetchStatistical = async () => {
+      try {
+        const data1 = Object.entries(type[new Date().toISOString().split("T")[0]]).map(
+          (el) => ({ name: el[0], value: el[1].totalMoney })
+        );
+        setdata(data1);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchStatistical();
+  }, []);
   return (
-     <Card className="w-[400px] h-[310px] rounded-2xl border-none bg-gradient-to-br  from-blue-500 to-fuchsia-500">
-      <CardBody className="justify-center items-center pb-0">
-      <CardFooter className="justify-center items-center pt-0">
-        <Chip
-          classNames={{
-            base: "border-1 border-white/30",
-            content: "text-white/90 text-small font-semibold",
-          }}
-          variant="bordered"
-        >
-          Tỷ Lệ Giao Hàng Thành Công
-        </Chip>
-      </CardFooter>
-        <CircularProgress
-          classNames={{
-            svg: "w-72 h-64 drop-shadow-md ",
-            indicator: "stroke-white ",
-            track: "stroke-white/10 ",
-            value: "text-3xl font-semibold text-black",
-          }}
-          value={70}
-          strokeWidth={4}
-          showValueLabel={true}
-        />
-      </CardBody>
+    <PieChart
+      width={300}
+      height={250}
+    >
+      <Pie
+        data={data}
+        cx={150}
+        cy={250/2}
+        className=""
+        innerRadius={60}
+        outerRadius={80}
+        fill="#8884d8"
+        paddingAngle={5}
+        dataKey="value"
+        cornerRadius={15} // Tạo độ bo tròn cho các phần, giá trị 5 cho góc bo tròn
+      >
+        {data.map((entry, index) => (
+          <Cell key={`cell-${index}`} className="" fill={COLORS[index % COLORS.length]} />
+        ))}
+      </Pie>
+      <Tooltip />
+      <Legend
       
-    </Card>
-    );
-}
+        layout="vertical"
+        verticalAlign="bottom"
+        align="center"
+        wrapperStyle={{
+          
+    display: "flex",
+    flexDirection: "column", // Hiển thị theo chiều dọc
+    alignItems: "center",// Khoảng cách với biểu đồ
+    fontSize: "12px",
+    fontFamily: "Arial",
+    fontWeight: "normal",
+    color: "#333",
+    marginTop: "0px",
+    marginLeft:"100px",
+  }}
+      />
+    </PieChart>
+  );
+};
 
-export default Piechart
+export default Piechart;

@@ -13,7 +13,7 @@ import { SaleFetch } from "./Component/Redux/SalesSlice.jsx";
 import { Button, Input } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faRightToBracket } from "@fortawesome/free-solid-svg-icons";
-import { statisticalFetch, statisticalGenderFetch } from "./Component/Redux/statisticalSlixe.jsx";
+import { Fetchstatistical, statisticalFetch, statisticalGenderFetch } from "./Component/Redux/statisticalSlixe.jsx";
 const App = () => {
   const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(false);
@@ -25,8 +25,7 @@ const App = () => {
       await dispatch(Custumer());
       await dispatch(OrderFetch());
       await dispatch(SaleFetch());
-      await dispatch(statisticalFetch())
-      await dispatch(statisticalGenderFetch())
+      await dispatch(Fetchstatistical())
     };
     fetch();
   }, []);

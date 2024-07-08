@@ -4,7 +4,8 @@ const statisticalSlice=createSlice({
     name:'statistical',
     initialState:{
         statistical:[],
-        gender:[]
+        gender:[],
+        type:[],
     },
     reducers:{
        
@@ -17,8 +18,17 @@ const statisticalSlice=createSlice({
     .addCase(statisticalGenderFetch.fulfilled, (state, action) => {
         state.gender=action.payload
     })
+    .addCase(statisticalTypeFetch.fulfilled, (state, action) => {
+      state.type=action.payload
+    })
  });
-
+export const Fetchstatistical = () => {
+  return async function check(dispatch, getState) {
+    await dispatch(statisticalFetch());
+    await dispatch(statisticalGenderFetch());
+    await dispatch(statisticalTypeFetch());
+  };
+};
  export const statisticalFetch=createAsyncThunk("statistical/statisticalFetch",
     async ()=>{
         const res= await fetch(`${url}/statistic/selling`, {
@@ -33,6 +43,17 @@ const statisticalSlice=createSlice({
  export const statisticalGenderFetch=createAsyncThunk("statistical/statisticalGenderFetch",
     async ()=>{
         const res= await fetch(`${url}/statistic/getrevenuebyTypeGender`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
+  return data;
+    }
+ )
+ export const statisticalTypeFetch=createAsyncThunk("statistical/statisticalTypeFetch",
+    async ()=>{
+        const res= await fetch(`${url}/statistic/getrevenuebyTypeProduct`, {
     headers: {
       "Content-Type": "application/json",
     },
