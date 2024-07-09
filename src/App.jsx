@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { CheckLogin, Custumer } from "./Component/Redux/CustummerSlice.jsx";
 import { OrderFetch } from "./Component/Redux/OrderSlice.jsx";
 import { SaleFetch } from "./Component/Redux/SalesSlice.jsx";
-import { State } from "./Component/Redux/selector.jsx";
+import { Infor, State } from "./Component/Redux/selector.jsx";
 
 import { Button, Input } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,6 +25,7 @@ import {
   statisticalGenderFetch,
 } from "./Component/Redux/statisticalSlixe.jsx";
 const App = () => {
+  const infor=useSelector(Infor)
   const check=useSelector(State)
   const navigate=useNavigate()
   const dispatch = useDispatch();
@@ -56,6 +57,15 @@ const App = () => {
           console.log(check)
           navigate('/Dashboard')
           setlogin(true)
+          toast.info(`WelCome Back ${infor.role}:${infor.username}`, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          });
           setemail('')
           setpass('')
         }

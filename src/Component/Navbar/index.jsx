@@ -63,7 +63,7 @@ const Index = () => {
     },
     {
       content: "Employee",
-      link: "/",
+      link: "/employee",
       icon: faUserTie,
       flat: false,
     },
