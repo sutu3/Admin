@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Inventory } from "./ProductSlice";
+import { Inventory, ProductFecth } from "./ProductSlice";
 const url = "http://26.232.136.42:8080/api";
 const PurchaseSlice = createSlice({
   name: "purchase",
@@ -1060,6 +1060,7 @@ export const ImportPurchase = (payload) => {
 
       await dispatch(ChangeStatusToReceive(payload.id));
       await dispatch(Inventory())
+      await dispatch(ProductFecth())
     } catch (error) {
       console.error(error); // Log lỗi ra console để kiểm tra
       toast.error(error.message, {

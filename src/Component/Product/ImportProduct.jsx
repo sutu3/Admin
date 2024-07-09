@@ -77,10 +77,14 @@ const ImportProduct = () => {
                     id: 11,
                   })
                 );
-                result.payload
-                  ?
+                if(result.payload)
+                {
                     navigate(`/Product/Import/${el.purchase_orders_id}`)
-                  : toast.info(`Your Permission Is Not Enough Affect`, {
+                }
+                else{
+
+                    navigate('/Product/Add')
+                  toast.info(`Your Permission Is Not Enough Affect`, {
                       position: "top-right",
                       autoClose: 2000,
                       hideProgressBar: false,
@@ -89,7 +93,8 @@ const ImportProduct = () => {
                       draggable: true,
                       progress: undefined,
                     });
-                    navigate('/Product/Add')
+                }
+               
                   }
                 else{
                   localStorage.removeItem('login')

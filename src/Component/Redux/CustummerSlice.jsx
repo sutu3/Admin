@@ -1,19 +1,21 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 const url = "http://26.232.136.42:8080/api";
-const checklogin = localStorage.getItem("login") ? JSON.parse(localStorage.getItem("login")) : {};
+const checklogin = localStorage.getItem("login")
+  ? JSON.parse(localStorage.getItem("login"))
+  : {};
 const CustumerSlice = createSlice({
   name: "custumer",
   initialState: {
     custumer: [],
     Roles: [],
     infor: checklogin,
-    check:localStorage.getItem("login")?true:false
+    check: localStorage.getItem("login") ? true : false,
   },
   reducers: {
-    changeState:(state,action)=>{
-      state.check=action.payload
-    }
+    changeState: (state, action) => {
+      state.check = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -28,9 +30,8 @@ const CustumerSlice = createSlice({
         state.custumer = [...state.custumer, action.payload];
       })
       .addCase(checkLoginPermision.fulfilled, (state, action) => {
-        if(action.payload!=-1)
-        {
-          state.infor=action.payload;
+        if (action.payload != -1) {
+          state.infor = action.payload;
           localStorage.setItem("login", JSON.stringify(state.infor));
         }
       })
@@ -542,17 +543,17 @@ export const CheckLogin = (payload) => {
         if (pass.payload != -1) {
           const info = await dispatch(checkLoginPermision(pass.payload));
           if (info.payload) {
-            dispatch(CustumerSlice.actions.changeState(true))
+            dispatch(CustumerSlice.actions.changeState(true));
           } else {
             toast.info(`Your Account Don't Enought Permision to Login`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-          });
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              progress: undefined,
+            });
             return false;
           }
         } else {
@@ -593,3 +594,172 @@ export const CheckLogin = (payload) => {
     }
   };
 };
+//thằng này thay đổi thông tin user
+export const ChangeInforUser = createAsyncThunk(
+  "custumer/ChangeAddressUser",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/account/updateaccountNoVerifi`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create new roles")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+//thằng này cập nhập address cho user
+export const ChangeAddressUser = createAsyncThunk(
+  "custumer/ChangeAddressUser",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/account/updateAddress`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create new roles")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const CreateAddressUser = createAsyncThunk(
+  "custumer/CreateAddressUser",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/account/createAddress`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create new roles")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const UpdateInforUser = (payload) => {
+  return async function check(dispatch, getState) {
+    try {
+      await dispatch(
+        ChangeInforUser({
+          account_id: payload.user.account_id,
+          username: payload.user.username,
+          password: payload.user.password,
+          email: payload.user.email,
+          height: 0,
+          weight: 0,
+          phoneNumber: payload.user.phoneNumber,
+          dayOfBirth: payload.user.dayOfBirth,
+          gender: payload.user.gender.currentKey,
+        })
+      );
+      payload.user.addresses.length != 0
+        ? await dispatch(
+            ChangeAddressUser({
+              id: payload.user.addresses[0].id,
+              account_id: payload.user.account_id,
+              city: payload.address.city,
+              state: payload.address.state,
+              country: payload.address.country,
+              title: "Nha o",
+              phonenumer: payload.user.phoneNumber,
+            })
+          )
+        : await dispatch(
+            CreateAddressUser({
+              account_id: payload.user.account_id,
+              city: payload.address.city,
+              state: payload.address.state,
+              country: payload.address.country,
+              title: "Nhà Ở",
+              phonenumer: payload.user.phoneNumber,
+            })
+          );
+      const formData = new FormData();
+      formData.append("file", payload.image);
+      formData.append("idAccount", payload.user.account_id);
+      await dispatch(Test(formData));
+      await dispatch(checkLoginPermision(payload.user.account_id))
+    } catch (error) {
+      toast.error(`Message :${error}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  };
+};
+export const Test = createAsyncThunk("customer/Test", async (payload) => {
+  console.log(payload);
+  const res = await fetch(`${url}/account/uploadAvatar`, {
+    method: "PUT",
+    body: payload,
+  });
+  const data = await res.text();
+  return data;
+});
