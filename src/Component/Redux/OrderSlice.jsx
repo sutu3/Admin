@@ -83,21 +83,8 @@ export const ChangeOrderStatus = (payload) => {
 
       socket.onopen = () => {
         console.log('Connected to WebSocket');
-      //    const res = fetch(
-      //   `${url}/orders/updateStatusOrder/${payload.id}?status=${payload.status}`,
-      //   {
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     method: "PUT",
-      //   }
-      // );
         const message = {
           type: "apiRequest",
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
           url: `http://26.232.136.42:8080/api/orders/updateStatusOrder/${payload.id}?status=${payload.status}`,
         };
         socket.send(JSON.stringify(message));

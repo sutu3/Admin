@@ -1,45 +1,31 @@
 import { useEffect } from 'react';
-import { toast } from "react-toastify";
 import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import OrderSlice from '../Redux/OrderSlice';
-const useAdminWebSocket = () => {
-  const dispatch=useDispatch()
-  
+import { Inventory } from '../Redux/ProductSlice';
+
+const useWebSocket = (url, onMessage) => {
   useEffect(() => {
-    const ws = new WebSocket('ws://26.232.136.42:8080/ws/product');
-    
-    ws.onopen = () => {
-      console.log('WebSocket connection established');
+    const socket = new WebSocket(url);
+
+    socket.onopen = () => {
+      console.log(`WebSocket connection established to ${url}`);
     };
-    
-    ws.onmessage = (event) => {
-      const newOrder = JSON.parse(event.data);
-      console.log(newOrder);
-      dispatch(OrderSlice.actions.addOrder(newOrder));
-      toast.info(`You Have new order`, {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
+
+    socket.onclose = () => {
+      console.log(`WebSocket connection closed from ${url}`);
     };
-    
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-    
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
+
+    socket.onmessage = onMessage;
+
+    socket.onerror = (error) => {
+      console.error(`WebSocket error from ${url}:`, error);
     };
 
     return () => {
-      ws.close();
+      socket.close();
     };
-  }, [dispatch]);
-
+  }, [url, onMessage]);
 };
 
-export default useAdminWebSocket;
+export default useWebSocket;

@@ -25,7 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { Infor, Orders, custumer, product } from "../Redux/selector";
 import PregresUI from "./index";
 import { useDispatch } from "react-redux";
-import { ChangeOrderStatus, OrderChangeStatus } from "../Redux/OrderSlice";
+import { ChangeOrderStatus } from "../Redux/OrderSlice";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import CustumerSlice, { checkPermosion } from "../Redux/CustummerSlice";
@@ -62,20 +62,23 @@ const Item = () => {
 // });
   const handleCancle=async ()=>{
     setLoading(true)
-    await dispatch(OrderChangeStatus({
-        status:'Cancel',
-        id:order.orders_id
+     dispatch(ChangeOrderStatus({
+        username: infor.username,
+          id: order.orders_id,
+          status: 'Cancel',
     }))
     setLoading(false)
-    toast.success(`Action Completed`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
+    setTimeout(()=>{
+      toast.success(`Action Completed`, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          });
+    },500)
   }
   const handleClickChange=async ()=>{
     setLoading(true)

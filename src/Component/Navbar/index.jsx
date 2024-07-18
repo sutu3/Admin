@@ -107,14 +107,14 @@ const Index = () => {
                 setTimeout(()=>{
                 toast.info(`Your Permission Is Not Enough Affect`, {
                   position: "top-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
+                  autoClose: 1000,
+                  hideProgressBar: true,
                   closeOnClick: true,
                   pauseOnHover: false,
                   draggable: true,
                   progress: undefined,
                 });
-                },500)
+                },1000)
               }
             }
           }}
