@@ -11,9 +11,9 @@ import {
   Textarea,
 } from "@nextui-org/react";
 import React, { useState } from "react";
-import { useLocation,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { PurchaseOrder } from "../Redux/selector";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import { ImportPurchase } from "../Redux/PurchaseSlice";
 const columns = [
@@ -25,12 +25,13 @@ const columns = [
   { name: "Size", uid: "size" },
   { name: "Color", uid: "color" },
   { name: "Quantity_real", uid: "quantity_real" },
-  {name:"Percentage",uid:"Percentage"},
+  { name: "Percentage", uid: "Percentage" },
   { name: "Price_sale", uid: "price_sale" },
 ];
 const Fixproduct = () => {
-  const navigate=useNavigate()
-    const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [loading,setloading]=useState(false)
   const [number, setnumber] = useState(1);
   const [selected, setselected] = useState([]);
   const [quantity, setquantity] = useState("");
@@ -43,41 +44,45 @@ const Fixproduct = () => {
     (el) => el.purchase_orders_id == location
   );
   const [list, setlist] = useState(
-    Order.status=='Receive'?
-    Order.purchaseorderitem.map((el) => ({
-      purchase_order_items_id: el.purchase_order_items_id,
-      version_name: el.version_name,
-      quantity: el.quantity,
-      purchase_price: el.purchase_price,
-      sizeEnum: el.sizeEnum,
-      color: el.color,
-      quantity_real: el.quantity_real,
-      Percentage:0,
-      price_real: 0,
-      variant:el.variant,
-      productID:el.productID,
-      productVersion:el.productVersion
-    })):Order.purchaseorderitem.map((el) => ({
-      purchase_order_items_id: el.purchase_order_items_id,
-      version_name: el.version_name,
-      quantity: el.quantity,
-      purchase_price: el.purchase_price,
-      sizeEnum: el.sizeEnum,
-      color: el.color,
-      quantity_real: 0,
-      Percentage:0,
-      price_real: 0,
-      variant:el.variant,
-      productID:el.productID,
-      productVersion:el.productVersion
-    }))
+    Order.status == "Receive"
+      ? Order.purchaseorderitem.map((el) => ({
+          purchase_order_items_id: el.purchase_order_items_id,
+          version_name: el.version_name,
+          quantity: el.quantity,
+          purchase_price: el.purchase_price,
+          sizeEnum: el.sizeEnum,
+          color: el.color,
+          quantity_real: el.quantity_real,
+          Percentage: 0,
+          price_real: 0,
+          variant: el.variant,
+          productID: el.productID,
+          productVersion: el.productVersion,
+        }))
+      : Order.purchaseorderitem.map((el) => ({
+          purchase_order_items_id: el.purchase_order_items_id,
+          version_name: el.version_name,
+          quantity: el.quantity,
+          purchase_price: el.purchase_price,
+          sizeEnum: el.sizeEnum,
+          color: el.color,
+          quantity_real: 0,
+          Percentage: 0,
+          price_real: 0,
+          variant: el.variant,
+          productID: el.productID,
+          productVersion: el.productVersion,
+        }))
   );
 
   // setlist(arr1)
-  const handleImport=async()=>{
-    await dispatch(ImportPurchase({data:list,id:location}));
-    navigate('/Product/Import')
-    toast.success('Action Change Complete', {
+  const handleImport = async () => {
+    setloading(true);
+    await dispatch(ImportPurchase({ data: list, id: location }));
+    setloading(false)
+    navigate("/Product/Import");
+    setTimeout(() => {
+      toast.success("Action Change Complete", {
         position: "top-right",
         autoClose: 2000,
         hideProgressBar: false,
@@ -86,7 +91,8 @@ const Fixproduct = () => {
         draggable: true,
         progress: undefined,
       });
-  }
+    }, 500);
+  };
   return (
     <div className="w-[1250px] h-full flex flex-row">
       <div className="w-[80%] h-full flex flex-col">
@@ -236,63 +242,69 @@ const Fixproduct = () => {
             className="w-full h-[40px] text-[#878889] shadow-inner bg-[#eeeeee] rounded-xl text-left"
           />
           <Button
-  onClick={() => {
-    if (parseInt(quantity) == quantity || quantity === '100%') {
-      if (parseInt(quantity) > 0) {
-        const arr = list.map((el) => {
-          if (selected.includes(el.purchase_order_items_id)) {
-            if (el.quantity < quantity && quantity !== '100%') {
-              toast.error(
-                `Quantity_real of ${el.purchase_order_items_id} is illegal`,
-                {
-                  position: "top-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: false,
-                  draggable: true,
-                  progress: undefined,
+            onClick={() => {
+              if (parseInt(quantity) == quantity || quantity === "100%") {
+                if (parseInt(quantity) > 0) {
+                  const arr = list.map((el) => {
+                    if (selected.includes(el.purchase_order_items_id)) {
+                      if (el.quantity < quantity && quantity !== "100%") {
+                        setTimeout(() => {
+                          toast.error(
+                            `Quantity_real of ${el.purchase_order_items_id} is illegal`,
+                            {
+                              position: "top-right",
+                              autoClose: 2000,
+                              hideProgressBar: false,
+                              closeOnClick: true,
+                              pauseOnHover: false,
+                              draggable: true,
+                              progress: undefined,
+                            }
+                          );
+                        }, 500);
+                        return el;
+                      } else {
+                        return {
+                          ...el,
+                          quantity_real:
+                            quantity === "100%" ? el.quantity : quantity,
+                        };
+                      }
+                    }
+                    return el;
+                  });
+                  setlist(arr);
+                  setquantity("");
+                } else {
+                  setTimeout(() => {
+                    toast.info(`Quantity_real is illegal`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                  }, 500);
                 }
-              );
-              return el;
-            } else {
-              return {
-                ...el,
-                quantity_real: quantity === '100%' ? el.quantity : quantity,
-              };
-            }
-          }
-          return el;
-        });
-        setlist(arr);
-        setquantity("");
-      } else {
-        toast.info(`Quantity_real is illegal`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
-      }
-    } else {
-      toast.info(`Enter quantity_real number`, {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }}
->
-  Update Quantity real
-</Button>
-
+              } else {
+                setTimeout(() => {
+                  toast.info(`Enter quantity_real number`, {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                }, 500);
+              }
+            }}
+          >
+            Update Quantity real
+          </Button>
         </div>
         <div>
           <Textarea
@@ -305,74 +317,114 @@ const Fixproduct = () => {
             className="w-full h-[40px] text-[#878889] shadow-inner bg-[#eeeeee] rounded-xl text-left"
           />
           <Button
-  onClick={() => {
-    const priceInt = parseInt(price);
-    if ( price !='') {
-      if (priceInt >= 0 && priceInt <= 100) {
-        const arr = list.map((el) => {
-          if (selected.includes(el.purchase_order_items_id)) {
-            console.log(el.quantity_real)
-            if (el.quantity_real != 0) {
-              return {
-                ...el,
-                Percentage: price,
-                price_real: el.purchase_price * (parseInt(price) / 100) + el.purchase_price
-              };
-            } else {
-              toast.info(
-                `Percentage price is illegal`,
-                {
-                  position: "top-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: true,
-                  pauseOnHover: false,
-                  draggable: true,
-                  progress: undefined,
+            onClick={() => {
+              const priceInt = parseInt(price);
+              if (price != "") {
+                if (priceInt >= 0 && priceInt <= 100) {
+                  const arr = list.map((el) => {
+                    if (selected.includes(el.purchase_order_items_id)) {
+                      console.log(el.quantity_real);
+                      if (el.quantity_real != 0) {
+                        return {
+                          ...el,
+                          Percentage: price,
+                          price_real:
+                            el.purchase_price * (parseInt(price) / 100) +
+                            el.purchase_price,
+                        };
+                      } else {
+                        setTimeout(() => {
+                          toast.info(`Percentage price is illegal`, {
+                            position: "top-right",
+                            autoClose: 2000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: false,
+                            draggable: true,
+                            progress: undefined,
+                          });
+                        }, 500);
+                        return el;
+                      }
+                    }
+                    return el;
+                  });
+                  setlist(arr);
+                  setquantity("");
+                } else {
+                  setTimeout(() => {
+                    toast.info(`Percentage price is illegal`, {
+                      position: "top-right",
+                      autoClose: 2000,
+                      hideProgressBar: false,
+                      closeOnClick: true,
+                      pauseOnHover: false,
+                      draggable: true,
+                      progress: undefined,
+                    });
+                  }, 500);
                 }
-              );
-              return el;
-            }
-          }
-          return el;
-        });
-        setlist(arr);
-        setquantity("");
-      } else {
-        toast.info(
-          `Percentage price is illegal`,
-          {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-          }
-        );
-      }
-    } else {
-      toast.info(
-        `Enter a valid percentage price`,
-        {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        }
-      );
-    }
-  }}
->
-  Select Price Sale
-</Button>
-
+              } else {
+                setTimeout(() => {
+                  toast.info(`Enter a valid percentage price`, {
+                    position: "top-right",
+                    autoClose: 2000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: true,
+                    progress: undefined,
+                  });
+                }, 500);
+              }
+            }}
+          >
+            Select Price Sale
+          </Button>
         </div>
-        <div><Button onPress={handleImport}>Confirm</Button></div>
+        <div>
+        {loading ? (
+                <Button
+                  aria-label="Loading Button"
+                  isLoading
+                  className="bg-blue-500 text-white font-bold"
+                  color="secondary"
+                  spinner={
+                    <svg
+                      className="animate-spin h-5 w-5 text-current"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  }
+                >
+                  Loading
+                </Button>
+              ) : (
+                <Button
+                  aria-label="Action Order Delivery"
+                  color="primary"
+                  className="border-[2px] border-green-400 bg-green-200 text-green-500"
+                  onPress={handleImport}
+                >
+                  Confirm
+                </Button>
+              )}
+        </div>
       </div>
     </div>
   );

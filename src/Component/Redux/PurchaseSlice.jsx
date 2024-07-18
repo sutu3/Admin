@@ -398,16 +398,6 @@ export const UpdateQualityOfVarient = createAsyncThunk(
             progress: undefined,
           }
         );
-      } else {
-        toast.success(`Update Quanlity Variant in stock complete`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
       }
       const data = await res.json();
       return data;
@@ -491,17 +481,7 @@ export const UpdateQualityOfVersion = createAsyncThunk(
             progress: undefined,
           }
         );
-      } else {
-        toast.success(`Update Quanlity Version in stock complete`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
-      }
+      } 
       const data = await res.json();
       return data;
     } catch (error) {
@@ -781,17 +761,7 @@ export const ChangeStatusToReceive = createAsyncThunk(
             progress: undefined,
           }
         );
-      } else {
-        toast.success(`Change Order to Received Complete`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
-      }
+      } 
       const data = await res.json();
       return data;
     } catch (error) {
@@ -826,16 +796,6 @@ export const UpdateTotalPriceOrderPurchase = createAsyncThunk(
             progress: undefined,
           }
         );
-      } else {
-        toast.success(`Update Total Price complete`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
       }
       const data = await res.json();
       return data;
@@ -869,16 +829,6 @@ export const UpdateQuantityOrdetItemPurchase = createAsyncThunk(
             progress: undefined,
           }
         );
-      } else {
-        toast.success(`Update Complete`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
       }
       const data = await res.json();
       return data;
@@ -913,16 +863,6 @@ export const UpdateQuantityAndPrice = createAsyncThunk(
             progress: undefined,
           }
         );
-      } else {
-        toast.success(`Update Complete`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
       }
       const data = await res.json();
       return data;
@@ -997,7 +937,6 @@ export const ImportPurchase = (payload) => {
             sale_date_end: null,
           })
         );
-        console.log(el);
         const category = categories.find(
           (el1) => el1.color === el.color && el1.sizeEnum === el.sizeEnum
         );
@@ -1020,7 +959,7 @@ export const ImportPurchase = (payload) => {
         await dispatch(
           CreateInventory({
             change_amount: parseInt(el.quantity_real),
-            event_type: "Nhập_hàng",
+            event_type: "Nhập Hàng",
             order_id: 0,
             inventoryVariant: el.variant,
             amount: parseInt(el.quantity_real),

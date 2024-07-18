@@ -19,17 +19,17 @@ import {
   User,
   useDisclosure,
 } from "@nextui-org/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { Orders, custumer, product } from "../Redux/selector";
+import { Infor, Orders, custumer, product } from "../Redux/selector";
 import PregresUI from "./index";
 import { useDispatch } from "react-redux";
-import { OrderChangeStatus } from "../Redux/OrderSlice";
+import { ChangeOrderStatus, OrderChangeStatus } from "../Redux/OrderSlice";
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import CustumerSlice, { checkPermosion } from "../Redux/CustummerSlice";
-import { Infor } from "../Redux/selector";
+import useWebSocket from "./UseWebSocket";
 const statusColorMap = {
   Prepare: "#f5f7ff",
   Pending: "#fdefe6",
@@ -37,6 +37,7 @@ const statusColorMap = {
   Completed: "#86efac",
   Cancel: "#fff3f5",
 };
+
 const Item = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const infor=useSelector(Infor)
@@ -78,20 +79,23 @@ const Item = () => {
   }
   const handleClickChange=async ()=>{
     setLoading(true)
-    await dispatch(OrderChangeStatus({
-        status:order.status=='Pending'?'Shipping':'Completed',
-        id:order.orders_id
+     dispatch(ChangeOrderStatus({
+        username: infor.username,
+          id: order.orders_id,
+          status: order.status === "Pending" ? "Shipping" : "Completed",
     }))
     setLoading(false)
-    toast.success(`Action Completed`, {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
+    setTimeout(()=>{
+      toast.success(`Action Completed`, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          });
+    },500)
   }
   return (
     <div className="w-[1350px] h-full flex flex-col  m-auto mt-10 ml-14" aria-labelledby="submit-label">
@@ -223,15 +227,17 @@ const Item = () => {
             </div>
             <div className="w-full h-full flex flex-col">
               <ScrollShadow hideScrollBar  aria-labelledby="submit-label" className="w-full max-h-80 ">
-                {order.orderItems.map((el) => (
-                  <div className="w-full items-center justify-between flex flex-row p-2 border-b-[2px] border-slate-300">
+                {order.orderItems.map((el,index) => (
+                  <div key={index} className="w-full items-center justify-between flex flex-row p-2 border-b-[2px] border-slate-300">
                     <User
                      aria-labelledby="submit-label"
                       avatarProps={{
                         radius: "lg",
                         src: Product.find((el1) =>
-    el1.productVersion.some((el2) => el2.productVersion_id === el.productVersion)
-  ).imagesMap[0].image_urlString,
+    el1.product_id === el.productID
+  )?Product.find((el1) =>
+    el1.product_id === el.productID
+  ).imagesMap[0].image_urlString:'',
                       }}
                       description={
                         <div className="flex flex-row w-full gap-1">

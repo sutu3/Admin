@@ -25,7 +25,7 @@ const users =!data?[]: data.data.flatMap((el) =>
     IDproduct: el1.idproduct,
     sizeColor: el1.sizeColor,
     amount: el1.amount,
-    icon: el1.reason === 'Đặt_hàng',
+    icon: el1.reason === 'Giao hàng thành công'?true:false,
     change_amount: el1.change_amount,
     reason: el1.reason,
   }))

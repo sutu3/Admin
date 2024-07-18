@@ -43,6 +43,7 @@ const columns = [
   {name: "ID", uid: "id", sortable: true},
   {name: "NAME", uid: "name", sortable: true},
   {name: "Type", uid: "type"},
+  {name: "Percent", uid: "percent"},
   {name: "Quantity", uid: "quantity", sortable: true},
   {name: "Gender", uid: "gender"},
 ];
@@ -56,25 +57,12 @@ const columns1 = [
   {name: "Total_Money", uid: "totalMoney"},
   {name: "Profit", uid: "profit"},
 ];
- {/* id:el.productID,
-    priceBase:el.priceBase,
-    priceSale:el.priceSale,
-    color:el.color,
-    size:el.size,
-    quantity:el.quantity,
-    totalMoney:el.totalMoney,
-    profit:(el.priceSale-el.priceBase)*el.quantity, */}
 const statusOptions = [
   {name: "Active", uid: "active"},
   {name: "Paused", uid: "paused"},
   {name: "Vacation", uid: "vacation"},
 ];
-
-
-
-const INITIAL_VISIBLE_COLUMNS = ["name","type","quantity","gender","id","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
-
-
+const INITIAL_VISIBLE_COLUMNS = ["name","type","percent","quantity","gender","id","next","Percent","quantity","Date_start","Date_end","title", "role", "status", "actions"];
 const CustomBar = (props) => {
   const { fill, x, y, width, height } = props;
   return (
@@ -127,12 +115,11 @@ const ProductSale=()=> {
     id:el.product_id,
     name:el.name,
     type:el.type,
+    percent:productSale.percent,
     quantity:sale.find((el1)=>el1.discount_id==location).saleDiscount.reduce((acc,el2)=>{
-  // If there's no entry in acc for the product_id yet, create a new entry
   if (!acc[el2.productID]) {
     acc[el2.productID] = 0;
   }
-  // Add the quantity to the existing entry for the product_id
   acc[el2.productID] += el2.quantity;
   // Return the updated accumulator
   return   acc;
@@ -541,15 +528,6 @@ const ProductSale=()=> {
               >
                 {el.name}
               </TableColumn>)}
-            {/* {(column1) => (
-              <TableColumn
-                key={column.uid}
-                align={column.uid === "actions" ? "center" : "start"}
-                allowsSorting={column.sortable}
-              >
-                {column.name}
-              </TableColumn>
-            )} */}
           </TableHeader>
           <TableBody emptyContent={"No users found"} items={sortedItems}>
           {user1.map((el,index)=><TableRow key={index}>

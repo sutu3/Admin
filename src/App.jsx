@@ -1,17 +1,18 @@
 import { toast, ToastContainer } from "react-toastify";
 import "./App.css";
 import Date from "./Component/Date/index";
+import "react-toastify/dist/ReactToastify.css";
 import Navbar from "./Component/Navbar/index.jsx";
-import { Outlet,useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { FetchInfom } from "./Component/Redux/ProductSlice.jsx";
 import { FetchPuchaseOrder } from "./Component/Redux/PurchaseSlice.jsx";
-import { useDispatch,useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { CheckLogin, Custumer } from "./Component/Redux/CustummerSlice.jsx";
-import { OrderFetch } from "./Component/Redux/OrderSlice.jsx";
+import OrderSlice, { OrderFetch } from "./Component/Redux/OrderSlice.jsx";
 import { SaleFetch } from "./Component/Redux/SalesSlice.jsx";
 import { Infor, State } from "./Component/Redux/selector.jsx";
-
+import Wedsocket from "./Component/Wedsocket/Order.jsx";
 import { Button, Input } from "@nextui-org/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,20 +20,82 @@ import {
   faEyeSlash,
   faRightToBracket,
 } from "@fortawesome/free-solid-svg-icons";
-import {
-  Fetchstatistical,
-  statisticalFetch,
-  statisticalGenderFetch,
-} from "./Component/Redux/statisticalSlixe.jsx";
+import { Fetchstatistical } from "./Component/Redux/statisticalSlixe.jsx";
+const UseWebSocket = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://26.232.136.42:8080/ws/product");
+    const order=new WebSocket("http://26.232.136.42:8080/ws/order")
+    ws.onopen = () => {
+      console.log("WebSocket connection established");
+    };
+    order.onopen = () => {
+      console.log("WebSocket connection established");
+    }
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+     ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+    ws.onmessage = (event) => {
+      const newOrder = JSON.parse(event.data);
+      dispatch(OrderSlice.actions.addOrder(newOrder));
+      setTimeout(() => {
+        toast.info(`You Have new order`, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      }, 500);
+    };
+     order.onmessage = (event) => {
+      const newOrder = JSON.parse(event.data);
+      console.log(newOrder)
+      // dispatch(OrderSlice.actions.addOrder(newOrder));
+      // setTimeout(() => {
+      //   toast.info(`You Have new order`, {
+      //     position: "top-right",
+      //     autoClose: 2000,
+      //     hideProgressBar: false,
+      //     closeOnClick: true,
+      //     pauseOnHover: false,
+      //     draggable: true,
+      //     progress: undefined,
+      //   });
+      // }, 500);
+    };
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+    order.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+   
+
+    return () => {
+      ws.close();
+    };
+  }, [dispatch]);
+
+  return null;
+};
 const App = () => {
-  const infor=useSelector(Infor)
-  const check=useSelector(State)
-  const navigate=useNavigate()
+  const infor = useSelector(Infor);
+  const check = useSelector(State);
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(false);
-  const [login, setlogin] = useState(localStorage.getItem("login")&&check?true:false);
-  const [pass, setpass] = useState('')
-  const [email,setemail]=useState('')
+  const [login, setlogin] = useState(
+    localStorage.getItem("login") && check ? true : false
+  );
+  const [pass, setpass] = useState("");
+  const [email, setemail] = useState("");
   const toggleVisibility = () => setIsVisible(!isVisible);
   useEffect(() => {
     const fetch = async () => {
@@ -46,17 +109,18 @@ const App = () => {
     fetch();
   }, []);
   const handleLogin = async () => {
-    if(email!='')
-      {
-       if(pass!=''){
-        const check =await dispatch(CheckLogin({
-          email:email,
-          pass:pass
-        }))
-        if(localStorage.getItem("login")){
-          console.log(check)
-          navigate('/Dashboard')
-          setlogin(true)
+    if (email != "") {
+      if (pass != "") {
+        const check = await dispatch(
+          CheckLogin({
+            email: email,
+            pass: pass,
+          })
+        );
+        if (localStorage.getItem("login")) {
+          console.log(check);
+          navigate("/Dashboard");
+          setlogin(true);
           toast.info(`WelCome Back ${infor.role}:${infor.username}`, {
             position: "top-right",
             autoClose: 2000,
@@ -66,33 +130,31 @@ const App = () => {
             draggable: true,
             progress: undefined,
           });
-          setemail('')
-          setpass('')
+          setemail("");
+          setpass("");
         }
-       } 
-       else{
+      } else {
         toast.info(`Pass is IsLegit`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-          });
-       }
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
       }
-      else{
-        toast.info(`Email is IsLegit`, {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: true,
-            progress: undefined,
-          });
-      }
+    } else {
+      toast.info(`Email is IsLegit`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   };
   return (
     <div className="w-screen h-full justify-start items-start flex flex-row p-0 m-0">
@@ -100,11 +162,11 @@ const App = () => {
         <>
           <div className="w-[18%] h-screen bg-[#f7f9fb] flex border-r-2 border-slate-300  fixed">
             <Navbar />
+            <UseWebSocket />
           </div>
           <div className="w-full h-full mt-0 ml-[280px]">
             <Outlet />
           </div>
-          
         </>
       ) : (
         <div
@@ -126,7 +188,7 @@ const App = () => {
                     inputWrapper: "",
                   }}
                   value={email}
-                  onChange={(e)=>setemail(e.target.value)}
+                  onChange={(e) => setemail(e.target.value)}
                   className=" w-[90%] m-auto"
                   placeholder="Enter your email"
                 />
@@ -138,7 +200,7 @@ const App = () => {
                   placeholder="Enter your password"
                   labelPlacement={"outside"}
                   value={pass}
-                  onChange={(e)=>setpass(e.target.value)}
+                  onChange={(e) => setpass(e.target.value)}
                   classNames={{
                     label: "text-slate-400 font-serif pb-20",
                     input: "border-[2px] border-slate-300 rounded-lg p-2",
@@ -176,8 +238,8 @@ const App = () => {
         </div>
       )}
       <div>
-            <ToastContainer />
-          </div>
+        <ToastContainer />
+      </div>
     </div>
   );
 };

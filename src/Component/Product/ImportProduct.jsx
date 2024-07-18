@@ -84,6 +84,7 @@ const ImportProduct = () => {
                 else{
 
                     navigate('/Product/Add')
+                    setTimeout(()=>{
                   toast.info(`Your Permission Is Not Enough Affect`, {
                       position: "top-right",
                       autoClose: 2000,
@@ -93,6 +94,7 @@ const ImportProduct = () => {
                       draggable: true,
                       progress: undefined,
                     });
+                    },500)
                 }
                
                   }
@@ -102,20 +104,6 @@ const ImportProduct = () => {
                   window.location.reload();
                 }
               }}
-                //   onClick={() => {
-                // infor.rolePermission.find(
-                //   (el) => el.permission == "Kiểm kê đơn nhập hàng"
-                // )
-                //   ? navigate(`/Product/Import/${el.purchase_orders_id}`)
-                //   : toast.info(`Your Permission Is Not Enough Affect`, {
-                //       position: "top-right",
-                //       autoClose: 2000,
-                //       hideProgressBar: false,
-                //       closeOnClick: true,
-                //       pauseOnHover: false,
-                //       draggable: true,
-                //       progress: undefined,
-                //     })}}
                 >
                   <TableCell>
                     <Checkbox

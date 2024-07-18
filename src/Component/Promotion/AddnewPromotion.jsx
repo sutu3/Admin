@@ -548,6 +548,7 @@ const [page1, setPage1] = React.useState(1);
                 date_end:DateEnd,
             }))
             navigate('/promotion')
+            setTimeout(()=>{
             toast.success(`Action Complete`, {
         position: "top-right",
         autoClose: 2000,
@@ -557,6 +558,7 @@ const [page1, setPage1] = React.useState(1);
         draggable: true,
         progress: undefined,
       });
+            },500)
 
         }} className="w-[200px] " >Create Discount</Button></div>
         
