@@ -356,7 +356,7 @@ export default function ImportProduct() {
         <Pagination
           showControls
           classNames={{
-            cursor: "bg-[#6542fd] shadow-inner text-white rounded-xl ",
+            cursor: "bg-[#6542fd] shadow-inner text-white rounded-xl "
           }}
           color="default"
           isDisabled={hasSearchFilter}
@@ -453,7 +453,7 @@ export default function ImportProduct() {
             }}
           >
             {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
+              <TableCell >{renderCell(item, columnKey)}</TableCell>
             )}
           </TableRow>
         )}
