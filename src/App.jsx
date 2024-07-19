@@ -61,13 +61,15 @@ const App = () => {
     },
   );
 
-  useWebSocket(
-    'ws://26.232.136.42:8080/ws/order',
-    async (event) => {
-      const newOrder = JSON.parse(event.data);
-      dispatch(OrderSlice.actions.changeStatusOrder(newOrder));
-      await dispatch(Inventory());
-      toast.info('Has Order change Status', {
+ useWebSocket(
+  'ws://26.232.136.42:8080/ws/order',
+  async (event) => {
+    let newOrder;
+
+    try {
+      newOrder = JSON.parse(event.data);
+    } catch (e) {
+      toast.info(`Has Order change Status By ${event.data}`, {
         position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
@@ -76,8 +78,12 @@ const App = () => {
         draggable: true,
         progress: undefined,
       });
-    },
-  );
+      return;
+    }
+    dispatch(OrderSlice.actions.changeStatusOrder(newOrder));
+    await dispatch(Inventory());
+  },
+);
 
   const handleLogin = async () => {
     if (email !== '') {

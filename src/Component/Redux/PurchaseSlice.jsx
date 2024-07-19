@@ -110,6 +110,7 @@ const PurchaseSlice = createSlice({
             order_date: formattedSpecificDate,
             purchase_orders_id: action.payload.purchaseOrder,
             purchaseorderitem: [action.payload],
+            order_update_date:null,
             status: "Prepare",
             total_amount:
               parseInt(action.payload.quantity) *
@@ -122,7 +123,18 @@ const PurchaseSlice = createSlice({
           JSON.stringify(state.OrderPurchase)
         );
       })
-
+      .addCase(ChangeStatecancle.fulfilled,(state,action)=>{
+        const index1 = state.OrderPurchase.findIndex(
+          (el) => el.purchase_orders_id == action.payload.purchase_orders_id
+        );
+        state.OrderPurchase = state.OrderPurchase.map((el, index) =>
+          index === index1? {...el, status: "Cancel" } : el
+        );
+        localStorage.setItem(
+          "orderPurchase",
+          JSON.stringify(state.OrderPurchase)
+        );
+      })
       .addCase(FetchPuchaseOrder.fulfilled, (state, action) => {
         state.OrderPurchase = action.payload;
         const index1 = state.OrderPurchase.findIndex(
@@ -871,6 +883,39 @@ export const UpdateQuantityAndPrice = createAsyncThunk(
     }
   }
 );
+//thằng này thay doỏi trạng thái thành cancel
+export const ChangeStatecancle = createAsyncThunk(
+  "purchase/ChangeStatecancle",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const res = await fetch(`${url}/puchase/cancel/${payload}`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "PUT",
+      });
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create purchase item")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 export const CreateInventory = createAsyncThunk(
   "purchase/CreateInventory",
   async (payload, { rejectWithValue }) => {
@@ -904,6 +949,28 @@ export const CreateInventory = createAsyncThunk(
     }
   }
 );
+export const ChangeStateCancleAnđUpatePrice = (payload) => {
+  return async function Check(dispatch, getState) {
+    try {
+      await dispatch(UpdateTotalPriceOrderPurchase({
+        purchase_orders_id: payload.id,
+          total_amount: payload.total_amount
+      }))
+      await dispatch(ChangeStatecancle(payload.id))
+    } catch (error) {
+      setTimeout(()=>{
+        toast.error(error.message, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+      },500)
+    }
+  }}
 //Thằng này dùng để lên giá sản phẩm và số lượng thực tế nhận được chuyển trạng thái sang received
 export const ImportPurchase = (payload) => {
   return async function Check(dispatch, getState) {
