@@ -50,15 +50,17 @@ const App = () => {
     async(event) => {
       const newOrder = JSON.parse(event.data);
       await dispatch(GetproductbyID(newOrder))
-      toast.info('You Have new Product', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
+      setTimeout(()=>{
+        toast.info('You Have new Product', {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      },500)
     },
   );
   useWebSocket(
@@ -66,15 +68,17 @@ const App = () => {
     (event) => {
       const newOrder = JSON.parse(event.data);
       dispatch(OrderSlice.actions.addOrder(newOrder));
-      toast.info('You Have new order', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
+      setTimeout(()=>{
+        toast.info('You Have new order', {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      },500)
     },
   );
 
@@ -84,15 +88,18 @@ const App = () => {
     try {
       newOrder = JSON.parse(event.data);
     } catch (e) {
-      toast.info(`Has Order change Status By ${event.data}`, {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
+      setTimeout(()=>{
+
+        toast.info(`Has Order change Status By ${event.data}`, {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      },500)
       return;
     }
     dispatch(OrderSlice.actions.changeStatusOrder(newOrder));
