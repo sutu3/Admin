@@ -6,6 +6,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from './Component/Navbar/index.jsx';
 import {
   FetchInfom,
+  GetproductbyID,
   Inventory
 } from './Component/Redux/ProductSlice.jsx';
 import { Custumer, CheckLogin } from './Component/Redux/CustummerSlice.jsx';
@@ -43,7 +44,22 @@ const App = () => {
     };
     fetch();
   }, [dispatch]);
-
+  useWebSocket(
+    'ws://26.232.136.42:8080/ws/purchase',
+    async(event) => {
+      const newOrder = JSON.parse(event.data);
+      await dispatch(GetproductbyID(newOrder))
+      toast.info('You Have new Product', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    },
+  );
   useWebSocket(
     'ws://26.232.136.42:8080/ws/product',
     (event) => {

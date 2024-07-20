@@ -72,6 +72,9 @@ const ProductSlice = createSlice({
           };
         });
       })
+      .addCase(GetproductbyID.fulfilled,(state,action) => {
+        state.product.push(action.payload)
+      })
       .addCase(GetProduct.fulfilled, (state, action) => {
          state.product = state.product.map((el)=>el.product_id==action.payload.product_id?action.payload:el);
       })
@@ -483,6 +486,20 @@ export const GetProduct = createAsyncThunk(
     return data;
   }
 );
+export const GetproductbyID = createAsyncThunk(
+  "product/Getproduct",
+  async (payload) => {
+    console.log(payload);
+    const res = await fetch(`${url1}/product/productshowV3/${payload}`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+    });
+    const data = await res.json();
+    return data;
+  }
+);
 export const CreateOfProduct = (payload) => {
   return async function check(dispatch, getState) {
     try {
@@ -534,7 +551,30 @@ export const CreateOfProduct = (payload) => {
           })
         );
       });
-      await dispatch(GetProduct(idproduct.payload));
+      const socketUrl = `ws://26.232.136.42:8080/ws/purchase`;
+      const socket = new WebSocket(socketUrl);
+      socket.onopen = () => {
+        console.log('Connected to WebSocket');
+        const message = {
+          id:idproduct.payload
+        };
+        alert(message)
+        socket.send(JSON.stringify({id:idproduct.payload}));
+      };
+
+      socket.onmessage = (event) => {
+        console.log('Message from server', event.data);
+      };
+
+      socket.onerror = (error) => {
+        console.error('WebSocket Error:', error);
+      };
+
+      // Đóng kết nối WebSocket khi component unmount
+      return () => {
+        socket.close();
+      };
+      //  await dispatch(GetProduct(idproduct.payload));
     } catch (error) {
       toast.error(`Create Product Fall ${error}`, {
         position: "top-right",

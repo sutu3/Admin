@@ -59,6 +59,7 @@ const statusColorMap = {
   Receive: "#59fbd6",
   Cancel: "#f9556b",
 };
+
 const INITIAL_VISIBLE_COLUMNS = [
   "name",
   "id",
