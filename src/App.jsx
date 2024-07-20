@@ -21,6 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import useWebSocket from './Component/Wedsocket/Order.jsx';
 import { FetchPuchaseOrder } from './Component/Redux/PurchaseSlice.jsx';
+import UseWebSocket from './Component/Order/UseWebSocket.jsx';
 
 const App = () => {
   const infor = useSelector(Infor);
@@ -77,9 +78,7 @@ const App = () => {
     },
   );
 
- useWebSocket(
-  'ws://26.232.136.42:8080/ws/order',
-  async (event) => {
+  const handleOrderMessage = async (event) => {
     let newOrder;
 
     try {
@@ -97,9 +96,68 @@ const App = () => {
       return;
     }
     dispatch(OrderSlice.actions.changeStatusOrder(newOrder));
+    // Tạo một WebSocket khác để gửi message
+    const secondarySocket = new WebSocket(
+      `ws://26.232.136.42:8080/ws/orderstatus?idAccount=${newOrder.account}`
+    );
+    secondarySocket.onopen = () => {
+      const message = { id: newOrder.account, status: newOrder.status, idOrder: newOrder.orders_id };
+      secondarySocket.send(JSON.stringify(message));
+    };
+
+    secondarySocket.onclose = () => {
+      console.log(`Secondary WebSocket connection closed`);
+    };
+
+    secondarySocket.onerror = (error) => {
+      console.error(`Secondary WebSocket error:`, error);
+    };
+
+    secondarySocket.onmessage = (event) => {
+      console.log(`Secondary WebSocket message received:`, event.data);
+    };
+
     await dispatch(Inventory());
-  },
-);
+  };
+
+  useWebSocket(
+    'ws://26.232.136.42:8080/ws/order',
+    handleOrderMessage
+  );
+//  useWebSocket(
+//   'ws://26.232.136.42:8080/ws/order',
+//   async (event) => {
+//     let newOrder;
+
+//     try {
+//       newOrder = JSON.parse(event.data);
+//     } catch (e) {
+//       toast.info(`Has Order change Status By ${event.data}`, {
+//         position: 'top-right',
+//         autoClose: 2000,
+//         hideProgressBar: false,
+//         closeOnClick: true,
+//         pauseOnHover: false,
+//         draggable: true,
+//         progress: undefined,
+//       });
+//       return;
+//     }
+//     dispatch(OrderSlice.actions.changeStatusOrder(newOrder));
+//    const secondarySocket = useWebSocket(
+//       `ws://26.232.136.42:8080/ws/orderstatus?idAccount=${newOrder.account}`,
+//       (event) => {
+//         // Xử lý các tin nhắn từ WebSocket này nếu cần thiết
+//       },
+//       (socket) => {
+//         // Gửi message khi WebSocket mở
+//         const message = { id: newOrder.account, status: newOrder.status, idOrder: newOrder.orders_id };
+//         socket.send(JSON.stringify(message));
+//       }
+//     );
+//     await dispatch(Inventory());
+//   },
+// );
 
   const handleLogin = async () => {
     if (email !== '') {

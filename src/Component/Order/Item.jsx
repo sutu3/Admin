@@ -66,6 +66,7 @@ const Item = () => {
         username: infor.username,
           id: order.orders_id,
           status: 'Cancel',
+          account_id: order.account
     }))
     setLoading(false)
     setTimeout(()=>{

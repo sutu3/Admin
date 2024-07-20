@@ -1,15 +1,15 @@
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { toast } from 'react-toastify';
-import OrderSlice from '../Redux/OrderSlice';
-import { Inventory } from '../Redux/ProductSlice';
+import { useEffect, useRef } from 'react';
 
-const useWebSocket = (url, onMessage) => {
+const useWebSocket = (url, onMessage, onAction) => {
+  const socketRef = useRef(null);
+
   useEffect(() => {
     const socket = new WebSocket(url);
+    socketRef.current = socket;
 
     socket.onopen = () => {
       console.log(`WebSocket connection established to ${url}`);
+      if (onAction) onAction(socket);
     };
 
     socket.onclose = () => {
@@ -25,7 +25,9 @@ const useWebSocket = (url, onMessage) => {
     return () => {
       socket.close();
     };
-  }, [url, onMessage]);
+  }, [url, onMessage, onAction]);
+
+  return socketRef.current;
 };
 
 export default useWebSocket;

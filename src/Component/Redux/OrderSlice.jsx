@@ -80,7 +80,6 @@ export const ChangeOrderStatus = (payload) => {
     try {
       const socketUrl = `ws://26.232.136.42:8080/ws/order?role=Employee&username=${encodeURIComponent(payload.username)}`;
       const socket = new WebSocket(socketUrl);
-
       socket.onopen = () => {
         console.log('Connected to WebSocket');
         const message = {

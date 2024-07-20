@@ -463,6 +463,7 @@ export const CreatePersonFix = createAsyncThunk(
     }
   }
 );
+
 export const Test = createAsyncThunk("product/Test", async (payload) => {
   console.log(payload);
   const res = await fetch(`http://26.232.136.42:8080/api/variant/creatImage`, {
