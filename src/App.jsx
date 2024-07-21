@@ -69,7 +69,7 @@ const App = () => {
     },
   );
   useWebSocket(
-    'ws://26.232.136.42:8080/ws/loginstatus',
+    `ws://26.232.136.42:8080/ws/loginstatus?role=${infor.role}`,
     async(event) => {
       const newOrder =event.data.split(' ');
       console.log(newOrder)
