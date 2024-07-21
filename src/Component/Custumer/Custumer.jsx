@@ -57,7 +57,7 @@ const columns = [
   { name: "ROLE", uid: "role", sortable: true },
   { name: "EMAIL", uid: "email" },
   { name: "Gender", uid: "gender", sortable: true },
-  { name: "ACTIONS", uid: "actions" },
+  { name: "Login", uid: "login" },
 ];
 const roles1 = ["Employee", "Customer", "Admin"];
 const statusOptions = [
@@ -72,7 +72,7 @@ const statusColorMap = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "role", "status", "actions"];
+const INITIAL_VISIBLE_COLUMNS = ["name","id","login","age","email","gender", "role", "status", "actions"];
 
 export default function App() {
   const Roles = useSelector(roles);
@@ -129,6 +129,7 @@ export default function App() {
           const arr=Custumer.map((el)=>el.account_id)
           setSelectedKeys(arr);
         }
+        console.log(Array.from(selectedKeys))
       const isCustomer = Custumer.filter((el) => el.role == "Customer").some(
         (el) => Array.from(selectedKeys).some((el1) => el1 == el.account_id)
       );
@@ -145,13 +146,20 @@ export default function App() {
         });
       } else {
         if (Array.from(selectedKeys).length == 1) {
-          const arr = Custumer[Array.from(selectedKeys)[0]].rolePermission
+          const arr = Custumer.find((el)=>el.account_id==Array.from(selectedKeys)[0]).rolePermission
             .map((el) => el.permission)
             .map(
               (el) =>
                 Roles.find((el1) => el1.permission_name == el).permissions_id
             );
-          setSelected(arr);
+            console.log(Array.from(selectedKeys).length)
+            
+
+              setSelected(arr);
+            
+        }
+        else{
+          setSelected([]);
         }
         setflat1(false);
         onOpen();
@@ -341,13 +349,14 @@ export default function App() {
     id: el.account_id,
     name: el.username,
     phoneNumber: el.phoneNumber,
-    gender: el.gender ? el.gender : "Chưa Cập nhập",
-    age: el.dayOfBirth ? calculateAge(el.dayOfBirth) : "Chưa Cập Nhập",
+    gender: el.gender ? el.gender : "--",
+    age: el.dayOfBirth ? calculateAge(el.dayOfBirth) : "--",
     avatar: el.avatarString
       ? el.avatarString
       : "https://www.freeiconspng.com/thumbs/account-icon/account-icon-8.png",
     email: el.email,
     role: el.role,
+    login:el.islogin
   }));
   console.log(users);
   const hasSearchFilter = Boolean(filterValue);
@@ -406,6 +415,10 @@ export default function App() {
     const cellValue = user[columnKey];
 
     switch (columnKey) {
+      case "login":
+        return (
+         <div className={`${cellValue?'bg-green-400 outline-green-600':'bg-red-400 outline-red-600'} outline-offset-1 outline-double outline-2 w-3 h-3 rounded-full`}></div>
+        );
       case "name":
         return (
           <User
@@ -661,7 +674,7 @@ export default function App() {
         isHeaderSticky
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
-        className="w-[1100px]"
+        className="w-[1550px] "
         classNames={{
           table: "shadow-lg rounded-lg",
           headerColumns: "bg-slate-300",
@@ -780,20 +793,21 @@ export default function App() {
               )
             ) : (
               <div className=" gap-5 flex flex-row flex-wrap">
-                {Roles.map((el) => (
+                {Roles.map((el,index) => (
                   <Button
+                  key={index}
                     onClick={() => {
                       const isSelected = selected.includes(el.permissions_id);
                       if (!isSelected) {
                         setSelected([...selected, el.permissions_id]);
                       } else {
                         setSelected(
-                          selected.filter((id) => id !== el.permissions_id)
+                          selected.filter((id) => id != el.permissions_id)
                         );
                       }
                     }}
                     className={`h-10 border-[2px]  w-[200px] m-auto ${
-                      selected.includes(el.permissions_id)
+                      (selected.includes(el.permissions_id)&&selected.length!=0)
                         ? "bg-[#b6bfec] text-[#5d73de] border-[#5d73de]"
                         : "border-slate-200"
                     }`}

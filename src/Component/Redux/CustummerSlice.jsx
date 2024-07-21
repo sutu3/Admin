@@ -425,6 +425,42 @@ export const checkEmail = createAsyncThunk(
     }
   }
 );
+export const ChangeStatus = createAsyncThunk(
+  "custumer/ChangeStatus",
+  async (payload, {getState, rejectWithValue }) => {
+    try {
+      const res = await fetch(
+        `${url}/account/updateLoginStatus/${getState().account.custumer.account_id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "PUT",
+        }
+      );
+
+      if (!res.ok) {
+        const error = await res.json();
+        toast.error(
+          `${new Error(error.message || "Failed to create new roles")}`,
+          {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          }
+        );
+      }
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 export const checkLoginPermision = createAsyncThunk(
   "custumer/checkLoginPermision",
   async (payload, { rejectWithValue }) => {

@@ -45,6 +45,10 @@ const App = () => {
       await dispatch(Fetchstatistical());
     };
     fetch();
+    // return () => {
+    //   // cleanup
+    //   alert('heheheheh')
+    // };
   }, [dispatch]);
   useWebSocket(
     'ws://26.232.136.42:8080/ws/purchase',
