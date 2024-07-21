@@ -74,17 +74,6 @@ const App = () => {
       const newOrder =event.data.split(' ');
       console.log(newOrder)
       dispatch(CustumerSlice.actions.changeLogin({id: newOrder[0],login: newOrder[1]}))
-      setTimeout(()=>{
-        toast.info('You Have new Product', {
-          position: 'top-right',
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: false,
-          draggable: true,
-          progress: undefined,
-        });
-      },500)
     },
   );
   useWebSocket(

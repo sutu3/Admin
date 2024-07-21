@@ -463,15 +463,14 @@ export const checkEmail = createAsyncThunk(
 export const LogOut = (payload) => {
   return async function check(dispatch, getState) {
     try {
-      await dispatch(ChangeStatus());
       const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${getState().account.infor.role}`;
-            const socket = new WebSocket(socketUrl);
-            socket.onopen = () => {
-              console.log("Connected to WebSocket");
-            const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false}
-              socket.send(JSON.stringify(message));
+      const socket = new WebSocket(socketUrl);
+      socket.onopen = async() => {
+        console.log("Connected to WebSocket");
+        const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false}
+        socket.send(JSON.stringify(message));
+        await dispatch(ChangeStatus());
             };
-
             socket.onmessage = (event) => {
               console.log("Message from server", event.data);
             };
