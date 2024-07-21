@@ -49,15 +49,13 @@ const Value = () => {
   const [value, setvalue] = useState(
     parseDate(new Date().toISOString().split("T")[0])
   );
-  console.log(value)
   const data = useSelector(Statistical);
   const order = useSelector(Orders);
   const Custumer = useSelector(custumer);
-  console.log(order);
    const today = new Date(value);
+   console.log(today.toISOString().split('T')[0])
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
-  console.log(today)
   useEffect(() => {
     const fetchStatistical = async () => {
       try {
@@ -95,7 +93,7 @@ const Value = () => {
  
   return (
     <div className="w-[1400px] h-full flex flex-col mt-5 translate-x-6 gap-5">
-    {/* <div>Thông Kê Doanh Thu Ngày {today}</div> */}
+    <div className="w-full justify-center flex font-serif text-xl">Thông Kê Doanh Thu Ngày <div className="font-bold pl-3">{today.toISOString().split('T')[0]}</div> </div>
       <div className="w-[100%] flex flex-row  justify-around gap-2">
         <div className="w-[70%] h-full flex flex-col gap-3 ">
           <div className="w-[100%] flex flex-row items-center justify-around p-2  rounded-2xl shadow-inner shadow-slate-500 ">
@@ -290,8 +288,8 @@ const Value = () => {
           />
         </div>
       </div>
-      <div className="w-[98%] flex flex-row  justify-between gap-2 m-auto  rounded-2xl shadow-inner shadow-slate-500">
-        <div className="w-[200px] text-xl h-full justify-center items-center font-mono mt-20">
+        <div className="w-[98%] mt-10 mb-10 p-5 flex flex-row  justify-between gap-2 m-auto  rounded-2xl shadow-inner shadow-slate-500">
+        <div className="w-[200px] h-full text-md justify-center items-center font-mono mt-10 translate-x-5">
           Top Các Sản phẩm bán chạy Trong ngày {value.toString()}
         </div>
         <Table

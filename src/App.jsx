@@ -29,7 +29,8 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isVisible, setIsVisible] = useState(false);
-  const [login, setLogin] = useState(localStorage.getItem('login') && check);
+  const [login, setLogin] = useState((localStorage.getItem('login') && check)?true:false);
+  console.log(login)
   const [pass, setPass] = useState('');
   const [email, setEmail] = useState('');
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -179,7 +180,23 @@ const App = () => {
           console.log(check);
           navigate('/Dashboard');
           setLogin(true);
-          toast.info(`WelCome Back ${infor.role}:${infor.username}`, {
+          setTimeout(()=>{
+            toast.info(`WelCome Back ${infor.role}:${infor.username}`, {
+              position: 'top-right',
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              progress: undefined,
+            });
+          },500)
+          setEmail('');
+          setPass('');
+        }
+      } else {
+        setTimeout(()=>{
+          toast.info('Pass is IsLegit', {
             position: 'top-right',
             autoClose: 2000,
             hideProgressBar: false,
@@ -188,11 +205,11 @@ const App = () => {
             draggable: true,
             progress: undefined,
           });
-          setEmail('');
-          setPass('');
-        }
-      } else {
-        toast.info('Pass is IsLegit', {
+          },500)
+      }
+    } else {
+      setTimeout(()=>{
+        toast.info('Email is IsLegit', {
           position: 'top-right',
           autoClose: 2000,
           hideProgressBar: false,
@@ -201,17 +218,7 @@ const App = () => {
           draggable: true,
           progress: undefined,
         });
-      }
-    } else {
-      toast.info('Email is IsLegit', {
-        position: 'top-right',
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: undefined,
-      });
+          },500)
     }
   };
 
@@ -281,7 +288,7 @@ const App = () => {
                   type={isVisible ? 'text' : 'password'}
                 />
               </div>
-              <div className="w-full">
+              <div className="w-full flex justify-center">
                 <Button
                   radius="xl"
                   endContent={<FontAwesomeIcon icon={faRightToBracket} />}

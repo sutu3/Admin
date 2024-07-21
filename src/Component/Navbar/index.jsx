@@ -32,18 +32,21 @@ const Index = () => {
       link: "/Dashboard",
       icon: faHouseChimneyUser,
       flat: false,
+      action: () => {},
     },
     {
       content: "Product",
       link: "/Product/Add",
       icon: faShirt,
       flat: false,
+      action: () => {},
     },
     {
       content: "Category",
       link: "/category",
       icon: faClipboardList,
       flat: false,
+      action: () => {},
     },
     {
       content: "Order",
@@ -51,24 +54,38 @@ const Index = () => {
       icon: faCartFlatbed,
       flat: true,
       message: order.length,
+      action: () => {},
     },
     {
       content: "Customer",
       link: "/custumer",
       icon: faUser,
       flat: false,
+      action: () => {},
     },
     {
       content: "Promotion",
       link: "/promotion",
       icon: faTag,
       flat: false,
+      action: () => {},
     },
     {
       content: "Employee",
       link: "/employee",
       icon: faUserTie,
       flat: false,
+      action: () => {},
+    },
+    {
+      content: "LogOut",
+      link: "/",
+      icon: faUserTie,
+      flat: false,
+     action: () => {
+      localStorage.removeItem('login')
+      window.onload()
+    },    
     },
   ];
 
@@ -96,6 +113,7 @@ const Index = () => {
           to={(el.link === "/custumer" && infor.rolePermission[0].role !== "Admin") ? '/Dashboard' : el.link}
           className="w-full h-fit"
           onClick={() => {
+            el.action()
             if (el.link !== "/custumer") {
               setIndex(index);
             } else {
