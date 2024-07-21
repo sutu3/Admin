@@ -326,9 +326,9 @@ const Purchar = () => {
           )}
         </div>
       </div>
-      <div className="flex flex-row w-[800px] h-full ">
-        <div className=" w-[90%] bg-transparent h-full p-5 flex flex-col gap-5">
-          <div className="bg-[#f9f9f9] p-5 w-full h-full flex flex-col rounded-md shadow-md">
+      <div className="flex flex-row w-[1250px] h-full ">
+        <div className=" w-[100%] bg-transparent h-full p-5 flex flex-col gap-5">
+          <div className="bg-[#f9f9f9] p-5  h-full flex flex-col rounded-md shadow-md">
             <div className="font-bold text-lg mb-2 flex justify-start">
               General Information
             </div>

@@ -97,7 +97,7 @@ const App = () => {
 
   const handleOrderMessage = async (event) => {
     let newOrder;
-
+    
     try {
       newOrder = JSON.parse(event.data);
     } catch (e) {

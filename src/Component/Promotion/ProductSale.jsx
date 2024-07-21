@@ -50,6 +50,7 @@ const columns = [
 const columns1 = [
   {name: "ID", uid: "id", sortable: true},
   {name: "Price_Base", uid: "priceBase"},
+  // {name: "Price", uid: "price"},
   {name: "Price_Sale", uid: "priceSale"},
   {name: "Size", uid: "size"},
   {name: "Color", uid: "color"},
@@ -130,6 +131,7 @@ const ProductSale=()=> {
   const user1=sale.find((el1)=>el1.discount_id==location).saleDiscount.map((el)=>el.productID==key?({
     id:el.productID,
     priceBase:el.priceBase,
+    price:(el.priceBase+(el.priceBase*users.find((el2)=>el2.id==el.productID).percent)),
     priceSale:el.priceSale,
     color:el.color,
     size:el.size,
