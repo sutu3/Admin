@@ -48,35 +48,7 @@ const users =!data?[]: data.data.flatMap((el) =>
 
     return users.slice(start, end);
   }, [page, users]);
-  const InventoryChart = () => {
-  const dataKeys = Object.keys(groupedData);
-
-  return (
-    <div className="w-full">
-      {dataKeys.map((key) => (
-        <ResponsiveContainer width="100%" height={400} key={key}>
-          <LineChart
-            data={groupedData[key]}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="Time" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line type="monotone" dataKey="amount" stroke="#8884d8" />
-            <Line type="monotone" dataKey="change_amount" stroke="#82ca9d" />
-          </LineChart>
-        </ResponsiveContainer>
-      ))}
-    </div>
-  );
-}
+  
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
     switch (columnKey) {

@@ -345,7 +345,7 @@ const Promotion=()=> {
         </BreadcrumbItem>
         <BreadcrumbItem>All Promotion</BreadcrumbItem>
       </Breadcrumbs>
-      <div className="w-full flex flex-col items-start">
+      {/* <div className="w-full flex flex-col items-start">
         <div className="text-3xl font-bold">Promotion</div>
         <div className="font-bold font-serif mt-3">At a glance</div>
         <div className="flex flex-row w-full gap-2 justify-center mt-5 mb-10">
@@ -482,7 +482,7 @@ const Promotion=()=> {
             </CardFooter>
           </Card>
         </div>
-      </div>
+      </div> */}
       <div>
         <Table
           aria-label="Example table with custom cells, pagination and sorting"

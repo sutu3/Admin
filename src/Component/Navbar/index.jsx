@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShirt,
   faCartFlatbed,
-  faCubesStacked,
+  faCubesStacked,faRightFromBracket
 } from "@fortawesome/free-solid-svg-icons";
 import { Badge } from "@nextui-org/react";
 import { toast, ToastContainer } from "react-toastify";
@@ -81,7 +81,7 @@ const Index = () => {
     {
       content: "LogOut",
       link: "/",
-      icon: faUserTie,
+      icon: faRightFromBracket,
       flat: false,
      action: async() => {
       localStorage.removeItem('login')
