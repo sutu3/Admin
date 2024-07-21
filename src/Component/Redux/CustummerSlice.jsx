@@ -464,11 +464,11 @@ export const LogOut = (payload) => {
   return async function check(dispatch, getState) {
     try {
       await dispatch(ChangeStatus());
-      const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus`;
+      const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${getState().account.infor.role}`;
             const socket = new WebSocket(socketUrl);
             socket.onopen = () => {
               console.log("Connected to WebSocket");
-            const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false,role:getState().account.infor.role}
+            const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false}
               socket.send(JSON.stringify(message));
             };
 
@@ -667,11 +667,11 @@ export const CheckLogin = (payload) => {
               progress: undefined,
             });
           },500)
-            const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus`;
+            const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${info.payload.role}`;
             const socket = new WebSocket(socketUrl);
             socket.onopen = () => {
               console.log("Connected to WebSocket");
-            const message={ idAccount:info.payload.account_id , loginStatus: true,role:info.payload.role}
+            const message={ idAccount:info.payload.account_id , loginStatus: true}
               socket.send(JSON.stringify(message));
             };
 

@@ -13,7 +13,7 @@ const Index = () => {
   const infor = useSelector(Infor);
   const [user,setuser]=useState(infor);
   const [loading,setloading]=useState(false)
-  const [address,setaddress]=useState(infor.addresses?infor.addresses[0]:{state:'',city:'',country:''});
+  const [address,setaddress]=useState(infor.addresses.length!=0?infor.addresses[0]:{state:'',city:'',country:''});
   const [imge, setimage] = useState();
   const fileInputRef = useRef(null);
   const handleFileUpload = () => {
