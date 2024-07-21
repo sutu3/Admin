@@ -161,7 +161,7 @@ const Index = () => {
           className="w-[89%]"
           labelPlacement={'outside-left'}
           classNames={{inputWrapper:'border-[2px] border-slate-300 rounded-lg',label:'pr-6'}}
-          defaultValue={parseDate(user.dayOfBirth)} 
+          defaultValue={user.dayOfBirth ? parseDate(user.dayOfBirth) : parseDate('2000-01-01')} 
           onChange={(e)=>setuser({...user,dayOfBirth:(e).toString()})}
           placeholderValue={new CalendarDate(1995, 11, 6)} 
           endContent={
@@ -176,7 +176,7 @@ const Index = () => {
         <Button className="border-[2px] border-slate-300"
           variant="bordered" 
         >
-          {user.gender}
+          {user.gender?user.gender:'Khác'}
         </Button>
       </DropdownTrigger>
       <DropdownMenu variant="faded" aria-label="Static Actions" 
