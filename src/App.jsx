@@ -70,10 +70,10 @@ const App = () => {
   );
   useWebSocket(
     `ws://26.232.136.42:8080/ws/loginstatus?role=${infor.role}`,
-    async(event) => {
+    (event) => {
       const newOrder =event.data.split(' ');
       console.log(newOrder)
-      dispatch(CustumerSlice.actions.changeLogin({id: newOrder[0],login: newOrder[1]}))
+      dispatch(CustumerSlice.actions.changeLogin({id: parseInt(newOrder[0]),login: newOrder[1]=='true'?true:false}))
     },
   );
   useWebSocket(

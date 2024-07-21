@@ -85,8 +85,27 @@ const Index = () => {
       flat: false,
      action: async() => {
       localStorage.removeItem('login')
-      await dispatch(LogOut())
-      window.location.reload();
+      await dispatch(ChangeStatus())
+      const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${infor.role}`;
+      const socket = new WebSocket(socketUrl);
+      socket.onopen = async() => {
+        console.log("Connected to WebSocket");
+        const message={ idAccount:infor.account_id , loginStatus: false}
+        socket.send(JSON.stringify(message));
+        window.location.reload();
+            };
+            socket.onmessage = (event) => {
+              console.log("Message from server", event.data);
+            };
+
+            socket.onerror = (error) => {
+              console.error("WebSocket Error:", error);
+            };
+
+            // Đóng kết nối WebSocket khi component unmount
+            return () => {
+              socket.close();
+            };
     },    
     },
   ];
