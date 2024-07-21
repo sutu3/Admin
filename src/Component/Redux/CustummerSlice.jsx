@@ -17,6 +17,7 @@ const CustumerSlice = createSlice({
       state.check = action.payload;
     },
     changeLogin:(state, action) => {
+      console.log(action.payload)
       state.custumer=state.custumer.map((el)=>el.account_id==action.payload.id?{...el,islogin:action.payload.login}:el)
       if(state.infor.account_id!=action.payload.id)
       {
@@ -463,11 +464,11 @@ export const LogOut = (payload) => {
   return async function check(dispatch, getState) {
     try {
       await dispatch(ChangeStatus());
-      const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${getState().account.infor.role}`;
+      const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus`;
             const socket = new WebSocket(socketUrl);
             socket.onopen = () => {
               console.log("Connected to WebSocket");
-            const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false}
+            const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false,role:getState().account.infor.role}
               socket.send(JSON.stringify(message));
             };
 
@@ -651,7 +652,9 @@ export const CheckLogin = (payload) => {
         );
         if (pass.payload != -1) {
           const info = await dispatch(checkLoginPermision(pass.payload));
+          console.log(info.payload)
           if (info.payload) {
+            console.log('kkkkk')
             dispatch(CustumerSlice.actions.changeState(true));
             setTimeout(()=>{
             toast.info(`WelCome Back ${info.payload.role}:${info.payload.username}`, {
@@ -664,11 +667,11 @@ export const CheckLogin = (payload) => {
               progress: undefined,
             });
           },500)
-            const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${info.payload.role}`;
+            const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus`;
             const socket = new WebSocket(socketUrl);
             socket.onopen = () => {
               console.log("Connected to WebSocket");
-            const message={ idAccount:info.payload.account_id , loginStatus: true}
+            const message={ idAccount:info.payload.account_id , loginStatus: true,role:info.payload.role}
               socket.send(JSON.stringify(message));
             };
 

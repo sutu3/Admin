@@ -18,7 +18,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { Orders, Infor } from "../Redux/selector";
 import OrderSlice from "../Redux/OrderSlice";
-import { ChangeStatus } from "../Redux/CustummerSlice";
+import { ChangeStatus, LogOut } from "../Redux/CustummerSlice";
 
 const Index = () => {
   const dispatch = useDispatch();
@@ -85,7 +85,7 @@ const Index = () => {
       flat: false,
      action: async() => {
       localStorage.removeItem('login')
-      await dispatch(ChangeStatus())
+      await dispatch(LogOut())
       window.location.reload();
     },    
     },
