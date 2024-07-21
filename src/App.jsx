@@ -184,17 +184,7 @@ const App = () => {
           console.log(check);
           navigate('/Dashboard');
           setLogin(true);
-          setTimeout(()=>{
-            toast.info(`WelCome Back ${infor.role}:${infor.username}`, {
-              position: 'top-right',
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: false,
-              draggable: true,
-              progress: undefined,
-            });
-          },500)
+          
           setEmail('');
           setPass('');
         }

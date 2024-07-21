@@ -427,10 +427,12 @@ export const checkEmail = createAsyncThunk(
 );
 export const ChangeStatus = createAsyncThunk(
   "custumer/ChangeStatus",
-  async (payload, {getState, rejectWithValue }) => {
+  async (payload, { getState, rejectWithValue }) => {
     try {
       const res = await fetch(
-        `${url}/account/updateLoginStatus/${getState().account.custumer.account_id}`,
+        `${url}/account/updateLoginStatus/${
+          getState().account.custumer.account_id
+        }`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -580,6 +582,37 @@ export const CheckLogin = (payload) => {
           const info = await dispatch(checkLoginPermision(pass.payload));
           if (info.payload) {
             dispatch(CustumerSlice.actions.changeState(true));
+            setTimeout(()=>{
+            toast.info(`WelCome Back ${info.payload.role}:${info.payload.username}`, {
+              position: 'top-right',
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              progress: undefined,
+            });
+          },500)
+            const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${info.payload.role}`;
+            const socket = new WebSocket(socketUrl);
+            socket.onopen = () => {
+              console.log("Connected to WebSocket");
+            const message={ idAccount:info.payload.account_id , loginStatus: true}
+              socket.send(JSON.stringify(message));
+            };
+
+            socket.onmessage = (event) => {
+              console.log("Message from server", event.data);
+            };
+
+            socket.onerror = (error) => {
+              console.error("WebSocket Error:", error);
+            };
+
+            // Đóng kết nối WebSocket khi component unmount
+            return () => {
+              socket.close();
+            };
           } else {
             toast.info(`Your Account Don't Enought Permision to Login`, {
               position: "top-right",
@@ -776,7 +809,7 @@ export const UpdateInforUser = (payload) => {
       formData.append("file", payload.image);
       formData.append("idAccount", payload.user.account_id);
       await dispatch(Test(formData));
-      await dispatch(checkLoginPermision(payload.user.account_id))
+      await dispatch(checkLoginPermision(payload.user.account_id));
     } catch (error) {
       toast.error(`Message :${error}`, {
         position: "top-right",
