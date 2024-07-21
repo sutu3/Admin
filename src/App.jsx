@@ -9,7 +9,7 @@ import {
   GetproductbyID,
   Inventory
 } from './Component/Redux/ProductSlice.jsx';
-import { Custumer, CheckLogin } from './Component/Redux/CustummerSlice.jsx';
+import CustumerSlice, { Custumer, CheckLogin } from './Component/Redux/CustummerSlice.jsx';
 import OrderSlice, { OrderFetch } from './Component/Redux/OrderSlice.jsx';
 import { SaleFetch } from './Component/Redux/SalesSlice.jsx';
 import { Infor, State } from './Component/Redux/selector.jsx';
@@ -55,6 +55,25 @@ const App = () => {
     async(event) => {
       const newOrder = JSON.parse(event.data);
       await dispatch(GetproductbyID(newOrder))
+      setTimeout(()=>{
+        toast.info('You Have new Product', {
+          position: 'top-right',
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+        });
+      },500)
+    },
+  );
+  useWebSocket(
+    'ws://26.232.136.42:8080/ws/loginstatus',
+    async(event) => {
+      const newOrder =event.data.split(' ');
+      console.log(newOrder)
+      dispatch(CustumerSlice.actions.changeLogin({id: newOrder[0],login: newOrder[1]}))
       setTimeout(()=>{
         toast.info('You Have new Product', {
           position: 'top-right',
@@ -184,7 +203,6 @@ const App = () => {
           console.log(check);
           navigate('/Dashboard');
           setLogin(true);
-          
           setEmail('');
           setPass('');
         }

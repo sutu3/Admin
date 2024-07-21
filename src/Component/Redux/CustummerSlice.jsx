@@ -16,6 +16,39 @@ const CustumerSlice = createSlice({
     changeState: (state, action) => {
       state.check = action.payload;
     },
+    changeLogin:(state, action) => {
+      state.custumer=state.custumer.map((el)=>el.account_id==action.payload.id?{...el,islogin:action.payload.login}:el)
+      if(state.infor.account_id!=action.payload.id)
+      {
+        if(action.payload.login)
+        {
+          setTimeout(()=>{
+          toast.info(`Employee ${state.custumer.find((el)=>el.account_id==action.payload.id).username} has just Login`, {
+            position: 'top-right',
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          });
+        },500)
+        }
+        else{
+          setTimeout(()=>{
+          toast.info(`Employee ${state.custumer.find((el)=>el.account_id==action.payload.id).username} has just LogOut`, {
+            position: 'top-right',
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+          });
+        },500)
+        }
+      }
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -425,6 +458,44 @@ export const checkEmail = createAsyncThunk(
     }
   }
 );
+//thằng này thông báo đăng xuất
+export const LogOut = (payload) => {
+  return async function check(dispatch, getState) {
+    try {
+      await dispatch(ChangeStatus());
+      const socketUrl = `ws://26.232.136.42:8080/ws/loginstatus?role=${getState().account.infor.role}`;
+            const socket = new WebSocket(socketUrl);
+            socket.onopen = () => {
+              console.log("Connected to WebSocket");
+            const message={ idAccount:getState().account.infor.payload.account_id , loginStatus: false}
+              socket.send(JSON.stringify(message));
+            };
+
+            socket.onmessage = (event) => {
+              console.log("Message from server", event.data);
+            };
+
+            socket.onerror = (error) => {
+              console.error("WebSocket Error:", error);
+            };
+
+            // Đóng kết nối WebSocket khi component unmount
+            return () => {
+              socket.close();
+            };
+    } catch (error) {
+      toast.error(`Message :${error}`, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }}
+//thằng này chuyển login thành false
 export const ChangeStatus = createAsyncThunk(
   "custumer/ChangeStatus",
   async (payload, { getState, rejectWithValue }) => {
