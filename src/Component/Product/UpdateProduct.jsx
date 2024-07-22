@@ -101,7 +101,7 @@ const handleActionClick = async () => {
         await dispatch(GetProduct(location))
         setLoading(false);
         onClose();
-        
+      setTimeout(()=>{
         toast.success("Action completed successfully!", {
             position: "top-right",
             autoClose: 2000, // Close after 2 seconds
@@ -111,6 +111,7 @@ const handleActionClick = async () => {
             draggable: true,
             progress: undefined,
         });
+      },500) 
     } catch (error) {
         setLoading(false);
         console.error("An error occurred:", error);

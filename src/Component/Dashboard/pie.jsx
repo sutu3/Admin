@@ -9,7 +9,6 @@ const Piechart = ({ value }) => {
   const type = useSelector(Statisticalgtype);
   const [data, setData] = useState([]);
   const [hasData, setHasData] = useState(true); // Trạng thái để kiểm tra dữ liệu có tồn tại hay không
-
   useEffect(() => {
     const fetchStatistical = async () => {
       try {
