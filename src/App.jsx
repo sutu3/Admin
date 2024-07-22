@@ -116,7 +116,7 @@ const App = () => {
       return;
     }
     dispatch(OrderSlice.actions.changeStatusOrder(newOrder));
-      await dispatch(Fetchstatistical());
+      
     // Tạo một WebSocket khác để gửi message
     const secondarySocket = new WebSocket(
       `ws://26.232.136.42:8080/ws/orderstatus?idAccount=${newOrder.account}`
@@ -139,6 +139,7 @@ const App = () => {
     };
 
     await dispatch(Inventory());
+    await dispatch(Fetchstatistical());
   };
 
   useWebSocket(
